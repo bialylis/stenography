@@ -1,161 +1,60 @@
+#include <math.h>
+#include <mcrypt.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "../lib/util.h"
 #include "../lib/stenography.h"
+#include "../lib/recover.h"
+#include "../lib/hide.h"
 
-void hide_message(const char* p_filename, char* msg,const char* out_filename, char alg){
-	FILE* p = fopen(p_filename,"rb");
-	FILE* out = fopen(out_filename,"wb");
-	int i;
-	for(i=0; i<54; i++){
-		fputc(fgetc(p), out);
+int emb(const char* in, const char * p, const char * out, const char * steg,
+		const char * a, const char * m, const char * pass) {
+	char* IV = "AAAAAAAAAAAAAAAA";
+	char *key = "0123456789abcdef";
+	int keysize = 16; /* 128 bits */
+	char* msg = parse_message_to_hide(in);
+	int size = *((int*) msg);
+	printf("Mensaje:%d %s\n", size, msg + 4);
+	if (*pass) {
+		char* buffer;
+		int buffer_len = ceil(size / 16.0) * 16;
+		buffer = calloc(1, buffer_len);
+		memcpy(buffer, msg, buffer_len);
+
+		encrypt(buffer, buffer_len, IV, key, keysize, DES, "cbc");
+		char* encrypted = preappend_size(buffer);
+		printf("Encrypted:%d %s\n", *((int*) encrypted), encrypted + 4);
+		msg = encrypted;
 	}
-	i=0;
-	switch(alg){
-		case LSB1:
-			hide_lsb1(msg, p, out);
-			break;
-		case LSB4:
-			hide_lsb4(msg, p, out);
-			break;
-		case LSBE:
-			hide_lsbe(msg, p, out);
-			break;
-	}
-	fclose(p);
-	fclose(out);
+	hide_message(p, msg, out, steg_from_string(steg));
 }
 
-char get_bit(char* bytes, int n){
-	 return (bytes[n/8] >> (7-(n%8)))&1;
-}
+int ext(const char * p, const char * out, const char * steg, const char * a,
+		const char * m, const char * pass) {
+	char* IV = "AAAAAAAAAAAAAAAA";
+	char *key = "0123456789abcdef";
+	int keysize = 16; /* 128 bits */
+	char* buffer;
+	int parsed_steg = steg_from_string(steg);
+	char* recovered = recover_msg(p, parsed_steg);
+	printf("Recuperado: %d %s\n", *((int*) recovered), recovered + 4);
 
-char get_nibble(char* bytes, int n){
-	 return (bytes[n/2] >> (4*((n+1)%2)))&0x0F;
-}
+	char* output;
+	if (*pass) {
+		// Desencriptar
+		int encrypted_size = *((int*) recovered);
+		int buffer_len = ceil(encrypted_size / 16.0) * 16;
+		buffer = calloc(1, buffer_len);
+		memcpy(buffer, recovered+4, buffer_len);
+		decrypt(buffer, buffer_len, IV, key, keysize, DES, "cbc");
+		output = buffer + 4;
+		printf("Decrypted:%s\n", output);
+	} else {
+		output = recovered + 4;
+	}
 
-char* recover_msg(const char* filename, char algorithm){
-	char* msg;
-	FILE* in = fopen(filename,"rb");
-	fseek(in, 54, SEEK_SET);
-	switch(algorithm){
-		case LSB1:
-			msg = recover_lsb1(in);
-			break;
-		case LSB4:
-			msg = recover_lsb4(in);
-			break;
-		case LSBE:
-			msg = recover_lsbe(in);
-			break;
-	}
-	fclose(in);
-	return msg;
-}
-
-void hide_lsb1(char* msg, FILE*p, FILE* out){
-	char c, hidden;
-	int i, size = *((int*)msg);
-	while(((c=fgetc(p))||1) && !feof(p)){
-		if(i<size*8){
-			hidden = (c & ~1) | get_bit(msg, i);
-			fputc(hidden, out);
-			i++;
-		}else{
-			fputc(c, out);
-		}
-
-	}
-}
-
-char* recover_lsb1(FILE* in){
-	char c, hidden, *msg;
-	int size=0, i;
-	for(i=0; i<4*8; i++){
-		hidden = fgetc(in);
-		*(((char*)&size)+i/8)|=((hidden&1)<<7-(i%8));
-	}
-	msg = calloc(size+4, sizeof(char));
-	memcpy(msg, &size, 4);
-	msg+=4;
-	for(i=0; i<(size-4)*8; i++){
-		hidden = fgetc(in);
-		*(msg+i/8)|=((hidden&1)<<7-(i%8));
-	}
-	msg[i/8]=0;
-	return msg-4;
-}
-
-void hide_lsb4(char* msg, FILE*p, FILE* out){
-	char c, hidden;
-	int i, size = *((int*)msg);
-	while(((c=fgetc(p))||1) && !feof(p)){
-		if(i<size*2){
-			hidden = c & 0xF0;
-			hidden |= get_nibble(msg,i);
-			fputc(hidden, out);
-			//printf("%x ",hidden);
-			//if(i%2==1){
-			//	printf(" (%x)\n",msg[i/2]);
-			//}
-			i++;
-		}else{
-			fputc(c, out);
-		}
-
-	}
-}
-
-char* recover_lsb4(FILE* in){
-	char c, hidden, *msg;
-	int size=0, i;
-	for(i=0; i<4*2; i++){
-		hidden = fgetc(in);
-		*(((char*)&size)+i/2)|=((hidden&0x0F)<<(4*((i+1)%2)));
-	}
-	msg = calloc(size+4, sizeof(char));
-	memcpy(msg, &size, 4);
-	msg+=4;
-	for(i=0; i<(size-4)*2; i++){
-		hidden = fgetc(in);
-		*(msg+i/2)|=((hidden&0x0F)<<(4*((i+1)%2)));
-	}
-	msg[i/2]=0;
-	return msg-4;
-}
-
-void hide_lsbe(char* msg, FILE*p, FILE* out){
-	unsigned char c, hidden;
-	int i, size = *((int*)msg);
-	while(((c=fgetc(p))||1) && !feof(p)){
-		if(i<size*8 && (c==254 || c==255)){
-			hidden = (c & ~1) | get_bit(msg, i);
-			fputc(hidden, out);
-			i++;
-		}else{
-			fputc(c, out);
-		}
-	}
-}
-
-char* recover_lsbe(FILE* in){
-	unsigned char c, hidden, *msg;
-	unsigned long size=0, i=0;
-	while(i<4*8){
-		hidden = fgetc(in);
-		if(hidden==255 || hidden==254){
-			*(((char*)&size)+i/8)|=((hidden&1)<<7-(i%8));
-			i++;
-		}
-	}
-	msg = calloc(size+4, sizeof(unsigned long));
-	memcpy(msg, &size, 4);
-	msg+=4;
-	i=0;
-	while(i<(size-4)*8){
-		hidden = fgetc(in);
-		if(hidden==255 || hidden==254){
-			*(msg+i/8)|=((hidden&1)<<7-(i%8));
-			i++;
-		}
-	}
-	msg[i/8]=0;
-	return msg-4;
+	FILE* out_file = fopen(out, "w");
+	fwrite(output, 1, strlen(output), out_file);
+	fclose(out_file);
 }
