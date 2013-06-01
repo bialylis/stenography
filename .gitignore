@@ -1,0 +1,19 @@
+# Object files
+*.o
+.cproject
+# Libraries
+*.lib
+*.a
+.project
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+.settings/
+# Executables
+*.exe
+*.out
+*.app
+VagrantFile
+.vagrant/
