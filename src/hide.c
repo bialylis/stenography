@@ -5,9 +5,9 @@
 #include "../lib/crypto.h"
 #include <math.h>
 
-char* message_to_hide(char* filename);
-char *get_filename_ext(char *filename);
-int file_size(char* filename);
+char* parse_message_to_hide(char* filename);
+char *parse_extension(char *filename);
+int get_file_size(char* filename);
 char* preappend_size(char* msg);
 
 int steg_from_string(const char* string){
@@ -51,7 +51,7 @@ int emb(const char* in, const char * p, const char * out, const char * steg, con
 	char* IV = "AAAAAAAAAAAAAAAA";
 	char *key = "0123456789abcdef";
 	int keysize = 16; /* 128 bits */
-	char* msg = message_to_hide("mensaje.txt");
+	char* msg = parse_message_to_hide("mensaje.txt");
 	int size = *((int*)msg);
 	printf("Mensaje:%d %s\n",size,msg+4);
 	if(*pass){
@@ -65,16 +65,17 @@ int emb(const char* in, const char * p, const char * out, const char * steg, con
 		printf("Encrypted:%d %s\n",*((int*)encrypted),encrypted+4);
 		msg = encrypted;
 	}
-	hide_msg(p, msg, out, steg_from_string(steg));
+	hide_message(p, msg, out, steg_from_string(steg));
 }
 
-char* message_to_hide(char* filename){
+char* parse_message_to_hide(char* filename){
 	FILE* in = fopen(filename,"r");
-	char* extension = get_filename_ext(filename);
-	int size = file_size(filename);
+	char* extension = parse_extension(filename);
+	int size = get_file_size(filename);
 
 	// Length = 4 (del tamaño) + longitud archivo + e (extensión)
 	int length = 4+ size + strlen(extension)+1;
+
 	printf("Size: %d, Extension: %s\n",length,extension);
 	char* msg = malloc(length);
 	char c, *p=msg, i;
@@ -99,13 +100,13 @@ char* preappend_size(char* msg){
 	return out;
 }
 
-char *get_filename_ext(char *filename) {
+char *parse_extension(char *filename) {
     char *dot = strrchr(filename, '.');
     if(!dot || dot == filename) return "";
     return dot;
 }
 
-int file_size(char* filename){
+int get_file_size(char* filename){
 	FILE* f = fopen(filename,"rb");
 	fseek(f,0,SEEK_END);
 	int size = ftell(f);

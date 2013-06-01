@@ -1,6 +1,6 @@
 #include "../lib/stenography.h"
 
-void hide_msg(const char* p_filename, char* msg,const char* out_filename, char alg){
+void hide_message(const char* p_filename, char* msg,const char* out_filename, char alg){
 	FILE* p = fopen(p_filename,"rb");
 	FILE* out = fopen(out_filename,"wb");
 	int i;
