@@ -7,4 +7,5 @@ and then build executing make
 
 Example:
 
-./stegobmp --embed -i resources/mensaje.txt -P resources/example/loimposibleE.bmp -o "loimposibleE1.bmp" -s LSBE
+./stegobmp --embed -i resources/mensaje.txt -p resources/example/loimposibleE.bmp -o resources/example/loimposibleE1.bmp -s LSBE
+./stegobmp --extract  -p resources/example/loimposibleE1.bmp -o resources/mensaje1.txt -s LSBE

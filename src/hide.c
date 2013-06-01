@@ -5,9 +5,9 @@
 #include "../lib/crypto.h"
 #include <math.h>
 
-char* parse_message_to_hide(char* filename);
-char *parse_extension(char *filename);
-int get_file_size(char* filename);
+char* parse_message_to_hide(const char* filename);
+char *parse_extension(const char *filename);
+int get_file_size(const char* filename);
 char* preappend_size(char* msg);
 
 int steg_from_string(const char* string){
@@ -25,7 +25,8 @@ int ext(const char * p, const char * out, const char * steg, const char * a, con
 	char *key = "0123456789abcdef";
 	int keysize = 16; /* 128 bits */
 	char* buffer;
-	char* recovered = recover_msg(p, steg_from_string(steg));
+	int parsed_steg = steg_from_string(steg);
+	char* recovered = recover_msg(p, parsed_steg);
 	printf("Recuperado: %d %s\n",*((int*)recovered),recovered+4);
 
 	char* output;
@@ -51,7 +52,7 @@ int emb(const char* in, const char * p, const char * out, const char * steg, con
 	char* IV = "AAAAAAAAAAAAAAAA";
 	char *key = "0123456789abcdef";
 	int keysize = 16; /* 128 bits */
-	char* msg = parse_message_to_hide("mensaje.txt");
+	char* msg = parse_message_to_hide(in);
 	int size = *((int*)msg);
 	printf("Mensaje:%d %s\n",size,msg+4);
 	if(*pass){
@@ -68,7 +69,7 @@ int emb(const char* in, const char * p, const char * out, const char * steg, con
 	hide_message(p, msg, out, steg_from_string(steg));
 }
 
-char* parse_message_to_hide(char* filename){
+char* parse_message_to_hide(const char* filename){
 	FILE* in = fopen(filename,"r");
 	char* extension = parse_extension(filename);
 	int size = get_file_size(filename);
@@ -100,13 +101,13 @@ char* preappend_size(char* msg){
 	return out;
 }
 
-char *parse_extension(char *filename) {
+char *parse_extension(const char *filename) {
     char *dot = strrchr(filename, '.');
     if(!dot || dot == filename) return "";
     return dot;
 }
 
-int get_file_size(char* filename){
+int get_file_size(const char* filename){
 	FILE* f = fopen(filename,"rb");
 	fseek(f,0,SEEK_END);
 	int size = ftell(f);

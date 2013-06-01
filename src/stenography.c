@@ -137,7 +137,7 @@ void hide_lsbe(char* msg, FILE*p, FILE* out){
 
 char* recover_lsbe(FILE* in){
 	unsigned char c, hidden, *msg;
-	int size=0, i=0;
+	unsigned long size=0, i=0;
 	while(i<4*8){
 		hidden = fgetc(in);
 		if(hidden==255 || hidden==254){
@@ -145,7 +145,7 @@ char* recover_lsbe(FILE* in){
 			i++;
 		}
 	}
-	msg = calloc(size+4, sizeof(char));
+	msg = calloc(size+4, sizeof(unsigned long));
 	memcpy(msg, &size, 4);
 	msg+=4;
 	i=0;
