@@ -3,7 +3,7 @@
 
 int encrypt(
     void* buffer,
-    int buffer_len, /* Because the plaintext could include null bytes*/
+    int buffer_len,
     char* IV,
     char* key,
     int key_len,

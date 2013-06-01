@@ -1,6 +1,8 @@
 #ifndef __UTIL__
 #define __UTIL__
 
+#include <mcrypt.h>
+
 #define LSB1 1
 #define LSB4 2
 #define LSBE 3
