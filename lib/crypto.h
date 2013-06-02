@@ -7,8 +7,8 @@ int encrypt(
     char* IV,
     char* key,
     int key_len,
-    char* alg,
-    char* chain
+    char* algorithm,
+    char* mode
 );
 
 int decrypt(
@@ -17,8 +17,8 @@ int decrypt(
     char* IV,
     char* key,
     int key_len,
-    char* alg,
-    char* chain
+    char* algorithm,
+    char* mode
 );
 
 #endif

@@ -21,7 +21,7 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 		buffer = calloc(1, buffer_len);
 		memcpy(buffer, msg, buffer_len);
 
-		encrypt(buffer, buffer_len, IV, key, keysize, DES, "cbc");
+		encrypt(buffer, buffer_len, IV, key, keysize, a, m);
 		char* encrypted = preappend_size(buffer);
 		printf("Encrypted:%d %s\n", *((int*) encrypted), encrypted + 4);
 		msg = encrypted;
@@ -46,7 +46,7 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 		int buffer_len = ceil(encrypted_size / 16.0) * 16;
 		buffer = calloc(1, buffer_len);
 		memcpy(buffer, recovered+4, buffer_len);
-		decrypt(buffer, buffer_len, IV, key, keysize, DES, "cbc");
+		decrypt(buffer, buffer_len, IV, key, keysize, a, m);
 		output = buffer + 4;
 		printf("Decrypted:%s\n", output);
 	} else {

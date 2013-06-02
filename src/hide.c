@@ -52,7 +52,7 @@ void hide_lsb1(char* msg, FILE*p, FILE* out) {
 
 void hide_lsb4(char* msg, FILE*p, FILE* out) {
 	char c, hidden;
-	int i, size = *((int*) msg);
+	unsigned long i, size = *((int*) msg);
 	while (((c = fgetc(p)) || 1) && !feof(p)) {
 		if (i < size * 2) {
 			hidden = c & 0xF0;
@@ -68,7 +68,7 @@ void hide_lsb4(char* msg, FILE*p, FILE* out) {
 
 void hide_lsbe(char* msg, FILE*p, FILE* out) {
 	unsigned char c, hidden;
-	int i, size = *((int*) msg);
+	unsigned long i, size = *((int*) msg);
 	while (((c = fgetc(p)) || 1) && !feof(p)) {
 		if (i < size * 8 && (c == 254 || c == 255)) {
 			hidden = (c & ~1) | get_bit(msg, i);

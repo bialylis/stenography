@@ -47,7 +47,7 @@ char* recover_lsb1(FILE* in){
 
 char* recover_lsb4(FILE* in){
 	char c, hidden, *msg;
-	int size=0, i;
+	unsigned long size=0, i;
 	for(i=0; i<4*2; i++){
 		hidden = fgetc(in);
 		*(((char*)&size)+i/2)|=((hidden&0x0F)<<(4*((i+1)%2)));
