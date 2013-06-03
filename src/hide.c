@@ -80,8 +80,9 @@ void hide_lsb4(char* msg, FILE*p, FILE* out) {
 void hide_lsbe(char* msg, FILE*p, FILE* out) {
 	unsigned char c, hidden;
 	unsigned long i = 0, size = *((int*) msg);
+	unsigned long bits_qty = size * 8;
 	while (((c = fgetc(p)) || 1) && !feof(p)) {
-		if (i < size * 8 && (c == 254 || c == 255)) {
+		if (i < bits_qty && (c == 254 || c == 255)) {
 			hidden = (c & ~1) | get_bit(msg, i);
 			fputc(hidden, out);
 			i++;
