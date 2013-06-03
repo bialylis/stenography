@@ -1,4 +1,6 @@
 #include <argtable2.h>
+#include "string.h"
+#include <stdio.h>
 #include "../lib/stenography.h"
 
 int main(int argc, char **argv){

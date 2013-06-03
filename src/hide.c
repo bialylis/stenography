@@ -12,7 +12,7 @@ void hide_lsb4(char* msg, FILE*p, FILE* out);
 void hide_lsbe(char* msg, FILE*p, FILE* out);
 
 void hide_message(const char* p_filename, char* msg, const char* out_filename,
-		char alg) {
+		char algorithm) {
 	FILE* p = fopen(p_filename, "rb");
 	FILE* out = fopen(out_filename, "wb");
 	int i;
@@ -20,7 +20,7 @@ void hide_message(const char* p_filename, char* msg, const char* out_filename,
 		fputc(fgetc(p), out);
 	}
 	i = 0;
-	switch (alg) {
+	switch (algorithm) {
 	case LSB1:
 		hide_lsb1(msg, p, out);
 		break;

@@ -12,9 +12,12 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 	char* IV = "AAAAAAAAAAAAAAAA";
 	char *key = "0123456789abcdef";
 	int keysize = 16; /* 128 bits */
-	char* msg = parse_message_to_hide(in);
+	char* msg = parse_message(in);
+
+	//Message new size
 	int size = *((int*) msg);
-	printf("Mensaje:%d %s\n", size, msg + 4);
+	printf("Mensaje: %s - Tamaño: %d\n", msg+4, size);
+
 	if (*pass) {
 		char* buffer;
 		int buffer_len = ceil(size / 16.0) * 16;
@@ -26,7 +29,8 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 		printf("Encrypted:%d %s\n", *((int*) encrypted), encrypted + 4);
 		msg = encrypted;
 	}
-	hide_message(p, msg, out, steg_from_string(steg));
+	hide_message(p, msg, out, get_algorithm(steg));
+	return 0;
 }
 
 int ext(const char * p, const char * out, const char * steg, const char * a,
@@ -35,7 +39,7 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 	char *key = "0123456789abcdef";
 	int keysize = 16; /* 128 bits */
 	char* buffer;
-	int parsed_steg = steg_from_string(steg);
+	int parsed_steg = get_algorithm(steg);
 	char* recovered = recover_msg(p, parsed_steg);
 	printf("Recuperado: %d %s\n", *((int*) recovered), recovered + 4);
 
@@ -56,4 +60,5 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 	FILE* out_file = fopen(out, "w");
 	fwrite(output, 1, strlen(output), out_file);
 	fclose(out_file);
+	return 0;
 }

@@ -2,5 +2,6 @@
 #define __HIDE__
 
 void hide_message(const char* p_filename, char* msg, const char* out_filename,
-		char alg);
+		char algorithm);
+
 #endif

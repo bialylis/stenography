@@ -14,10 +14,9 @@ char get_bit(char* bytes, int n);
 char get_nibble(char* bytes, int n);
 
 /* Parse methods */
-char *parse_extension(const char *filename);
-int get_file_size(const char* filename);
-int steg_from_string(const char* string);
-char* parse_message_to_hide(const char* filename);
+
+int get_algorithm(const char* string);
+char* parse_message(const char* filename);
 char* preappend_size(char* msg);
 
 #endif

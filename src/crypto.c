@@ -1,5 +1,6 @@
 #include <mcrypt.h>
 #include "string.h"
+#include <stdio.h>
 #include "../lib/crypto.h"
 
 int encrypt(void* buffer, int buffer_len,
