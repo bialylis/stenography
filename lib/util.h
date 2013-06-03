@@ -8,6 +8,9 @@
 #define LSBE 3
 #define AES_128 MCRYPT_RIJNDAEL_128
 #define DES MCRYPT_3DES
+#define HEADER_BYTES 54
+#define FILE_LENGTH_SIZE 4
+#define BITS_PER_BYTE 8
 
 /* Get  methods */
 char get_bit(char* bytes, int n);

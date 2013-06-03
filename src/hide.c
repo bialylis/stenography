@@ -7,8 +7,6 @@
 #include "../lib/stenography.h"
 #include "../lib/crypto.h"
 
-#define HEADER_BYTES 54
-
 void hide_lsb1(char* msg, FILE*p, FILE* out);
 void hide_lsb4(char* msg, FILE*p, FILE* out);
 void hide_lsbe(char* msg, FILE*p, FILE* out);
@@ -43,7 +41,7 @@ void hide_message(const char* p_filename, char* msg, const char* out_filename,
 void hide_lsb1(char* msg, FILE*p, FILE* out) {
 	char c, hidden;
 	unsigned long i = 0, size = *((int*) msg);
-	unsigned long bits_qty = size * 8;
+	unsigned long bits_qty = size * BITS_PER_BYTE;
 	while (((c = fgetc(p)) || 1) && !feof(p)) {
 		if (i < bits_qty) {
 			// ~1 = 1111110
@@ -80,7 +78,7 @@ void hide_lsb4(char* msg, FILE*p, FILE* out) {
 void hide_lsbe(char* msg, FILE*p, FILE* out) {
 	unsigned char c, hidden;
 	unsigned long i = 0, size = *((int*) msg);
-	unsigned long bits_qty = size * 8;
+	unsigned long bits_qty = size * BITS_PER_BYTE;
 	while (((c = fgetc(p)) || 1) && !feof(p)) {
 		if (i < bits_qty && (c == 254 || c == 255)) {
 			hidden = (c & ~1) | get_bit(msg, i);

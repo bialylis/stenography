@@ -16,7 +16,7 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 
 	//Message new size
 	int size = *((int*) msg);
-	printf("Mensaje: %s - Tamaño: %d\n", msg+4, size);
+	printf("Mensaje: %s - Tamaño: %d\n", msg + FILE_LENGTH_SIZE, size);
 
 	if (*pass) {
 		char* buffer;
@@ -41,7 +41,7 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 	char* buffer;
 	int parsed_steg = get_algorithm(steg);
 	char* recovered = recover_msg(p, parsed_steg);
-	printf("Recuperado: %d %s\n", *((int*) recovered), recovered + 4);
+	printf("Recuperado: %s - Tamaño: %d\n", recovered + 4, *((int*) recovered));
 
 	char* output;
 	if (*pass) {

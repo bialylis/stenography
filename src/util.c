@@ -19,7 +19,7 @@ char* parse_message(const char* filename) {
 	int size = get_file_size(filename);
 
 	// Length = 4 (para el tamaño) + longitud archivo + longitud extension + 1 ('\0')
-	int length = 4 + size + strlen(extension) + 1;
+	int length = FILE_LENGTH_SIZE + size + strlen(extension) + 1;
 
 	char* msg = malloc(length);
 	char c;
@@ -27,9 +27,9 @@ char* parse_message(const char* filename) {
 	char i;
 
 	//First part of the message is the length
-	memcpy(msg, &length, 4);
+	memcpy(msg, &length, FILE_LENGTH_SIZE);
 
-	p += 4;
+	p += FILE_LENGTH_SIZE;
 
 	//Copy rest of the message
 	while ((c = fgetc(in)) != -1) {
@@ -79,8 +79,8 @@ char* preappend_size(char* msg) {
 	int length = strlen(msg) + 4;
 	char* out = malloc(length);
 	char c, *p = out, i;
-	p += 4;
-	memcpy(out, &length, 4);
-	strcpy(out+4, msg);
+	p += FILE_LENGTH_SIZE;
+	memcpy(out, &length, FILE_LENGTH_SIZE);
+	strcpy(out+FILE_LENGTH_SIZE, msg);
 	return out;
 }
