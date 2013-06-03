@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <arpa/in.h>
 #include "../lib/util.h"
 #include "../lib/recover.h"
 
@@ -37,7 +38,8 @@ char* recover_lsb1(FILE* in) {
 	//Recovers file size: Reads the first FILE_LENGTH_SIZE
 	for (i = 0; i < FILE_LENGTH_SIZE * BITS_PER_BYTE; i++) {
 		hidden = fgetc(in);
-		*(((char*) &size) + i / 8) |= ((hidden & 1) << 7 - (i % 8));
+		unsigned char bit = ((hidden & 1) << 7 - (i % 8));
+		*(((char*) &size) + i / 8) |= bit;
 	}
 	msg = calloc(size + FILE_LENGTH_SIZE, sizeof(char));
 	memcpy(msg, &size, FILE_LENGTH_SIZE);
