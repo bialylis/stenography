@@ -41,12 +41,13 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 	char* buffer;
 	int parsed_steg = get_algorithm(steg);
 	char* recovered = recover_msg(p, parsed_steg);
+	int encrypted_size = *((int*) recovered);
 	printf("Recuperado: %s - Tamaño: %d\n", recovered + 4, *((int*) recovered));
 
 	char* output;
 	if (*pass) {
 		// Desencriptar
-		int encrypted_size = *((int*) recovered);
+		
 		int buffer_len = ceil(encrypted_size / 16.0) * 16;
 		buffer = calloc(1, buffer_len);
 		memcpy(buffer, recovered+4, buffer_len);
@@ -58,7 +59,7 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 	}
 
 	FILE* out_file = fopen(out, "w");
-	fwrite(output, 1, strlen(output), out_file);
+	fwrite(output, 1, encrypted_size, out_file);
 	fclose(out_file);
 	return 0;
 }

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <arpa/in.h>
+#include <netinet/in.h>
 #include "../lib/util.h"
 #include "../lib/recover.h"
 
@@ -34,6 +34,8 @@ char* recover_msg(const char* filename, char algorithm) {
 char* recover_lsb1(FILE* in) {
 	char c, hidden, *msg;
 	unsigned long size = 0, i;
+	int ended = 0;
+	int counter = 0;
 
 	//Recovers file size: Reads the first FILE_LENGTH_SIZE
 	for (i = 0; i < FILE_LENGTH_SIZE * BITS_PER_BYTE; i++) {
@@ -41,7 +43,9 @@ char* recover_lsb1(FILE* in) {
 		unsigned char bit = ((hidden & 1) << 7 - (i % 8));
 		*(((char*) &size) + i / 8) |= bit;
 	}
-	msg = calloc(size + FILE_LENGTH_SIZE, sizeof(char));
+	//changes size to little endian
+	size = htonl(size);
+	msg = calloc(size + FILE_LENGTH_SIZE + 15 * sizeof(char), sizeof(char));
 	memcpy(msg, &size, FILE_LENGTH_SIZE);
 	msg += 4;
 	for (i = 0; i < (size - FILE_LENGTH_SIZE) * BITS_PER_BYTE; i++) {
@@ -49,6 +53,27 @@ char* recover_lsb1(FILE* in) {
 		*(msg + i / 8) |= ((hidden & 1) << 7 - (i % 8));
 	}
 	msg[i / 8] = 0;
+	i++;
+	// msg = realloc(msg, size + FILE_LENGTH_SIZE + 15);
+	// get the extension
+	while(!ended) {
+		hidden = fgetc(in);
+		unsigned char bit = ((hidden & 1) << 7 - (i % 8));
+		*(msg + i / 8) |= bit;
+		if(bit == 0) {
+			counter++;
+		} else {
+			counter = 0;
+		}
+		if(counter == 8) {
+			ended = 1;
+		}
+		if(i%8 == 0) {
+			counter = 0;
+		}
+		i++;
+	}
+
 	return msg - FILE_LENGTH_SIZE;
 }
 
