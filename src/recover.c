@@ -5,11 +5,12 @@
 #include "../lib/util.h"
 #include "../lib/recover.h"
 
-char* recover_lsb1(FILE* in);
-char* recover_lsb4(FILE* in);
-char* recover_lsbe(FILE* in);
+char* recover_lsb1(FILE* in, int *extension_size, char** extension);
+char* recover_lsb4(FILE* in, int *extension_size, char** extension);
+char* recover_lsbe(FILE* in, int *extension_size, char** extension);
 
-char* recover_msg(const char* filename, char algorithm) {
+char* recover_msg(const char* filename, char algorithm, int * extension_size,
+		char ** extension) {
 	char* msg;
 	FILE* in = fopen(filename, "rb");
 
@@ -18,20 +19,20 @@ char* recover_msg(const char* filename, char algorithm) {
 
 	switch (algorithm) {
 	case LSB1:
-		msg = recover_lsb1(in);
+		msg = recover_lsb1(in, extension_size, extension);
 		break;
 	case LSB4:
-		msg = recover_lsb4(in);
+		msg = recover_lsb4(in, extension_size, extension);
 		break;
 	case LSBE:
-		msg = recover_lsbe(in);
+		msg = recover_lsbe(in, extension_size, extension);
 		break;
 	}
 	fclose(in);
 	return msg;
 }
 
-char* recover_lsb1(FILE* in) {
+char* recover_lsb1(FILE* in, int *extension_size, char **extension) {
 	char c, hidden, *msg;
 	unsigned long size = 0, i;
 	int ended = 0;
@@ -45,39 +46,42 @@ char* recover_lsb1(FILE* in) {
 	}
 	//changes size to little endian
 	size = htonl(size);
-	msg = calloc(size + FILE_LENGTH_SIZE + 15 * sizeof(char), sizeof(char));
+	msg = calloc(size + FILE_LENGTH_SIZE, sizeof(char));
 	memcpy(msg, &size, FILE_LENGTH_SIZE);
 	msg += 4;
-	for (i = 0; i < (size - FILE_LENGTH_SIZE) * BITS_PER_BYTE; i++) {
+	for (i = 0; i < size * BITS_PER_BYTE; i++) {
 		hidden = fgetc(in);
 		*(msg + i / 8) |= ((hidden & 1) << 7 - (i % 8));
 	}
 	msg[i / 8] = 0;
-	i++;
-	// msg = realloc(msg, size + FILE_LENGTH_SIZE + 15);
-	// get the extension
-//	while(!ended) {
-//		hidden = fgetc(in);
-//		unsigned char bit = ((hidden & 1) << 7 - (i % 8));
-//		*(msg + i / 8) |= bit;
-//		if(bit == 0) {
-//			counter++;
-//		} else {
-//			counter = 0;
-//		}
-//		if(counter == 8) {
-//			ended = 1;
-//		}
-//		if(i%8 == 0) {
-//			counter = 0;
-//		}
-//		i++;
-//	}
-
+	int j = 0;
+	char *auxExtension = calloc(30, sizeof(char));
+	while (!ended) {
+		if (j % 30 == 0) {
+			auxExtension = realloc(auxExtension, (30 + j) * sizeof(char));
+		}
+		hidden = fgetc(in);
+		unsigned char bit = ((hidden & 1) << 7 - (j % 8));
+		*(auxExtension + j / 8) |= bit;
+		if (bit == 0) {
+			counter++;
+		} else {
+			counter = 0;
+		}
+		if (counter == 8) {
+			ended = 1;
+		}
+		if (j % 8 == 0) {
+			counter = 0;
+		}
+		j++;
+	}
+	*extension = auxExtension;
+	*extension_size = j;
 	return msg - FILE_LENGTH_SIZE;
 }
 
-char* recover_lsb4(FILE* in) {
+char* recover_lsb4(FILE* in, int *extension_size, char** extension) {
 	char c, hidden, *msg;
 	unsigned long size = 0, i;
 	for (i = 0; i < 4 * 2; i++) {
@@ -90,7 +94,7 @@ char* recover_lsb4(FILE* in) {
 	msg = calloc(size + FILE_LENGTH_SIZE, sizeof(char));
 	memcpy(msg, &size, FILE_LENGTH_SIZE);
 	msg += 4;
-	for (i = 0; i < (size - FILE_LENGTH_SIZE) * 2; i++) {
+	for (i = 0; i < size * 2; i++) {
 		hidden = fgetc(in);
 		*(msg + i / 2) |= ((hidden & 0x0F) << (4 * ((i + 1) % 2)));
 	}
@@ -98,7 +102,7 @@ char* recover_lsb4(FILE* in) {
 	return msg - FILE_LENGTH_SIZE;
 }
 
-char* recover_lsbe(FILE* in) {
+char* recover_lsbe(FILE* in, int *extension_size, char** extension) {
 	unsigned char c, hidden, *msg;
 	unsigned long size = 0, i = 0;
 	while (i < 4 * 8) {
@@ -115,7 +119,7 @@ char* recover_lsbe(FILE* in) {
 	memcpy(msg, &size, BITS_PER_BYTE);
 	msg += BITS_PER_BYTE;
 	i = 0;
-	while (i < (size - FILE_LENGTH_SIZE) * BITS_PER_BYTE) {
+	while (i < size * BITS_PER_BYTE) {
 		hidden = fgetc(in);
 		if (hidden == 255 || hidden == 254) {
 			*(msg + i / 8) |= ((hidden & 1) << 7 - (i % 8));

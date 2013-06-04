@@ -7,14 +7,14 @@ and then build executing make
 
 Examples:
 
-//JPG
+//JPG 135054 bytes
 ./stegobmp --extract  -p resources/example/loimposibleE.bmp -o resources/example/out/salida1 -s LSBE
 
 
-//MP3
+//MP3 2348246 bytes
 ./stegobmp --extract -p resources/example/sherlock1.bmp -o resources/example/out/salida2  -s LSB1
 
 
-//MP3
+//MP3 2348246 bytes
 ./stegobmp --extract -p resources/example/sherlock4.bmp -o resources/example/out/salida3  -s LSB4
 

@@ -16,7 +16,7 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 
 	//Message new size
 	int size = *((int*) msg);
-	printf("Mensaje: %s - Tamaño: %d\n", msg + FILE_LENGTH_SIZE, size);
+	printf("Mensaje: %s - Tama��o: %d\n", msg + FILE_LENGTH_SIZE, size);
 
 	if (*pass) {
 		char* buffer;
@@ -40,14 +40,17 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 	int keysize = 16; /* 128 bits */
 	char* buffer;
 	int parsed_steg = get_algorithm(steg);
-	char* recovered = recover_msg(p, parsed_steg);
+	int extension_size = 0;
+	char * extension;
+	char* recovered = recover_msg(p, parsed_steg, &extension_size, &extension);
 	int encrypted_size = *((int*) recovered);
-	printf("Recuperado: %s - Tamaño: %d\n", recovered + 4, *((int*) recovered));
+	printf("Recuperado: %s - Tama��o: %d\n", recovered + 4,
+			*((int*) recovered));
 
 	char* output;
 	if (*pass) {
 		// Desencriptar
-		
+
 		int buffer_len = ceil(encrypted_size / 16.0) * 16;
 		buffer = calloc(1, buffer_len);
 		memcpy(buffer, recovered+4, buffer_len);
@@ -58,8 +61,12 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 		output = recovered + 4;
 	}
 
-	FILE* out_file = fopen(out, "w");
+	char * new_out = calloc(strlen(out) + extension_size, sizeof(char*));
+	memcpy(new_out, out, strlen(out)*sizeof(char*));
+	strcat(new_out, extension);
+	FILE* out_file = fopen(new_out, "w");
 	fwrite(output, 1, encrypted_size, out_file);
 	fclose(out_file);
+
 	return 0;
 }

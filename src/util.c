@@ -18,7 +18,7 @@ char* parse_message(const char* filename) {
 	char* extension = parse_extension(filename);
 	int size = get_file_size(filename);
 
-	// Length = 4 (para el tamaño) + longitud archivo + longitud extension + 1 ('\0')
+	// Length = 4 (para el tamaño del archivo) + longitud archivo + longitud extension + 1 ('\0')
 	int length = FILE_LENGTH_SIZE + size + strlen(extension) + 1;
 
 	char* msg = malloc(length);
@@ -27,7 +27,7 @@ char* parse_message(const char* filename) {
 	char i;
 
 	//First part of the message is the length
-	memcpy(msg, &length, FILE_LENGTH_SIZE);
+	memcpy(msg, &size, FILE_LENGTH_SIZE);
 
 	p += FILE_LENGTH_SIZE;
 
