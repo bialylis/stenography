@@ -76,7 +76,7 @@ char* recover_lsb4(FILE* in, int *extension_size, char** extension) {
 
 	msg = preappend_recovered_size(&size);
 
-//Recover the hidden message
+	//Recover the hidden message
 	for (i = 0; i < size * 2; i++) {
 		hidden = fgetc(in);
 		*(msg + i / 2) |= LSB4_RECOVER(hidden, i)
@@ -84,7 +84,7 @@ char* recover_lsb4(FILE* in, int *extension_size, char** extension) {
 	}
 	msg[i / 2] = 0;
 
-//Recovers the extension
+	//Recovers the extension
 	*extension_size = recover_extension(in, extension, LSB4);
 	return msg - FILE_LENGTH_SIZE;
 }
@@ -93,10 +93,10 @@ char* recover_lsbe(FILE* in, int *extension_size, char** extension) {
 	unsigned char c, hidden, *msg;
 	unsigned long size = 0, i = 0;
 
-//Recovers file size: Reads the first FILE_LENGTH_SIZE
+	//Recovers file size: Reads the first FILE_LENGTH_SIZE
 	while (i < FILE_LENGTH_SIZE * BITS_PER_BYTE) {
 		hidden = fgetc(in);
-		if (hidden == 255 || hidden == 254) {
+		if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
 			*(((char*) &size) + i / 8) |= LSBE_RECOVER(hidden,i)
 			;
 			i++;
@@ -105,11 +105,11 @@ char* recover_lsbe(FILE* in, int *extension_size, char** extension) {
 
 	msg = preappend_recovered_size(&size);
 
-//Recover the hidden message
+	//Recover the hidden message
 	i = 0;
 	while (i < size * BITS_PER_BYTE) {
 		hidden = fgetc(in);
-		if (hidden == 255 || hidden == 254) {
+		if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
 			*(msg + i / 8) |= LSBE_RECOVER(hidden,i)
 			;
 			i++;
@@ -117,7 +117,7 @@ char* recover_lsbe(FILE* in, int *extension_size, char** extension) {
 	}
 	msg[i / 8] = 0;
 
-//Recovers the extension
+	//Recovers the extension
 	*extension_size = recover_extension(in, extension, LSBE);
 	return msg - FILE_LENGTH_SIZE;
 }
@@ -133,18 +133,18 @@ int recover_extension(FILE *in, char **extension, char algorithm) {
 		unsigned char bit;
 		switch (algorithm) {
 		case LSB1:
-			bit = ((hidden & 1) << 7 - (j % 8));
+			bit = LSB1_RECOVER(hidden, j);
 			*(auxExtension + j / 8) |= bit;
 			j++;
 			break;
 		case LSB4:
-			bit = ((hidden & 0x0F) << (4 * ((j + 1) % 2)));
+			bit = LSB4_RECOVER(hidden, j);
 			*(auxExtension + j / 2) |= bit;
 			j++;
 			break;
 		case LSBE:
-			if (hidden == 255 || hidden == 254) {
-				bit = ((hidden & 1) << 7 - (j % 8));
+			if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
+				bit = LSBE_RECOVER(hidden, j);
 				*(auxExtension + j / 8) |= bit;
 				j++;
 			}
