@@ -57,6 +57,11 @@ int encrypt(FILE* in, unsigned long size, const char* algorithm, const char * mo
 //	const EVP_CIPHER *EVP_aes_256_cfb128(void);
 //	const EVP_CIPHER *EVP_aes_256_ofb(void);
 
+
+//unsigned char key[16];
+//	unsigned char iv[16];
+
+	//EVP_BytesToKey(EVP_aes_256_ofb(), EVP_md5(), NULL, pass, strlen(pass),1, key, iv);
 //	EVP_CIPHER_CTX ctx = EVP_des_cbc();
 	EVP_CIPHER_CTX ctx;
 //	EVP_CIPHER_CTX_init(&ctx);
@@ -82,6 +87,12 @@ int decrypt(FILE* in, unsigned long size, const char* algorithm, const char * mo
 //	unsigned char buf2crypt[INBUFSIZE];
 //	unsigned char outBuf[OUTBUFSIZE];
 //
+	int tmpl, outl, inl;
+	unsigned char key[16];
+	unsigned char iv[16];
+
+	//EVP_BytesToKey(EVP_aes_256_ofb(), EVP_md5(), NULL, pass, strlen(pass),1, key, iv);
+
 //	EVP_CIPHER_CTX ctx;
 //	EVP_CIPHER_CTX_init(&ctx);
 //	EVP_DecryptInit_ex(&ctx, EVP_aes_256_ofb(), NULL, key, IV);
