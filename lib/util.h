@@ -1,7 +1,6 @@
 #ifndef __UTIL__
 #define __UTIL__
 
-#include <mcrypt.h>
 
 #define LSB1 1
 #define LSB4 2
@@ -9,8 +8,6 @@
 #define LSBE_BYTE_SET_1 255
 #define LSBE_BYTE_SET_2 254
 
-#define AES_128 MCRYPT_RIJNDAEL_128
-#define DES MCRYPT_3DES
 #define HEADER_BYTES 54
 #define FILE_LENGTH_SIZE 4
 #define BITS_PER_BYTE 8

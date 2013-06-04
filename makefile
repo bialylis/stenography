@@ -1,2 +1,2 @@
 stegobmp: src/args.c src/hide.c src/steganography.c src/crypto.c src/util.c src/recover.c
-	gcc -g -o stegobmp src/args.c src/hide.c src/steganography.c src/crypto.c src/util.c src/recover.c -lm -lmcrypt -largtable2
+	gcc -g -o stegobmp src/args.c src/hide.c src/steganography.c src/crypto.c src/util.c src/recover.c -lm -lssl -largtable2
