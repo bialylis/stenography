@@ -11,18 +11,16 @@ char* recover_lsbe(FILE* in, int *extension_size, char** extension);
 int recover_extension(FILE *in, char **extension, char algorithm);
 char * preappend_recovered_size(unsigned long *size);
 
-#define LSB1_RECOVER(hidden, i) ((hidden & 1) << 7 - (i % 8));
-#define LSB4_RECOVER(hidden, i) ((hidden & 0x0F) << (4 * ((i + 1) % 2)));
-#define LSBE_RECOVER(hidden, i) LSB1_RECOVER(hidden,i)
-
 char* recover_msg(const char* filename, char algorithm, int * extension_size,
 		char ** extension) {
 	char* msg;
+
 	FILE* in = fopen(filename, "rb");
 
 	//Skip header bytes
 	fseek(in, HEADER_BYTES, SEEK_SET);
 
+	unsigned long encrypted_size = 0;
 	switch (algorithm) {
 	case LSB1:
 		msg = recover_lsb1(in, extension_size, extension);
@@ -133,18 +131,21 @@ int recover_extension(FILE *in, char **extension, char algorithm) {
 		unsigned char bit;
 		switch (algorithm) {
 		case LSB1:
-			bit = LSB1_RECOVER(hidden, j);
+			bit = LSB1_RECOVER(hidden, j)
+			;
 			*(auxExtension + j / 8) |= bit;
 			j++;
 			break;
 		case LSB4:
-			bit = LSB4_RECOVER(hidden, j);
+			bit = LSB4_RECOVER(hidden, j)
+			;
 			*(auxExtension + j / 2) |= bit;
 			j++;
 			break;
 		case LSBE:
 			if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
-				bit = LSBE_RECOVER(hidden, j);
+				bit = LSBE_RECOVER(hidden, j)
+				;
 				*(auxExtension + j / 8) |= bit;
 				j++;
 			}

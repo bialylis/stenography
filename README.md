@@ -19,5 +19,5 @@ Examples:
 ./stegobmp --extract -p resources/example/sherlock4.bmp -o resources/example/out/salida3  -s LSB4
 
 
-./stegobmp --extract -p resources/example/sherlock4aes128cbc.bmp -o resources/example/out/salida4  -s LSB4 -a aes128 -m cbc --pass secreto
+./stegobmp --extract -p resources/example/sherlock4aes256ofb.bmp -o resources/example/out/salida4  -s LSB4 -a aes256 -m ofb --pass secreto
 

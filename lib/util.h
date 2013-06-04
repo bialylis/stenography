@@ -1,7 +1,6 @@
 #ifndef __UTIL__
 #define __UTIL__
 
-
 #define LSB1 1
 #define LSB4 2
 #define LSBE 3
@@ -11,6 +10,20 @@
 #define HEADER_BYTES 54
 #define FILE_LENGTH_SIZE 4
 #define BITS_PER_BYTE 8
+
+#define AES_128 "aes128"
+#define AES_192 "aes192"
+#define AES_256 "aes256"
+#define DES "des"
+
+#define ECB "ecb"
+#define CFB "cfb"
+#define OFB "ofb"
+#define CBC "cbc"
+
+#define LSB1_RECOVER(hidden, i) ((hidden & 1) << 7 - (i % 8));
+#define LSB4_RECOVER(hidden, i) ((hidden & 0x0F) << (4 * ((i + 1) % 2)));
+#define LSBE_RECOVER(hidden, i) LSB1_RECOVER(hidden,i);
 
 /* Get  methods */
 char get_bit(char* bytes, int n);
