@@ -44,8 +44,8 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 	char * extension;
 	char* recovered = recover_msg(p, parsed_steg, &extension_size, &extension);
 	int encrypted_size = *((int*) recovered);
-	printf("Recuperado: %s - Tama��o: %d\n", recovered + 4,
-			*((int*) recovered));
+	printf("Size recovered: %d - Extension: %s\n", *((int*) recovered),
+			extension);
 
 	char* output;
 	if (*pass) {
