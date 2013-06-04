@@ -56,23 +56,23 @@ char* recover_lsb1(FILE* in) {
 	i++;
 	// msg = realloc(msg, size + FILE_LENGTH_SIZE + 15);
 	// get the extension
-	while(!ended) {
-		hidden = fgetc(in);
-		unsigned char bit = ((hidden & 1) << 7 - (i % 8));
-		*(msg + i / 8) |= bit;
-		if(bit == 0) {
-			counter++;
-		} else {
-			counter = 0;
-		}
-		if(counter == 8) {
-			ended = 1;
-		}
-		if(i%8 == 0) {
-			counter = 0;
-		}
-		i++;
-	}
+//	while(!ended) {
+//		hidden = fgetc(in);
+//		unsigned char bit = ((hidden & 1) << 7 - (i % 8));
+//		*(msg + i / 8) |= bit;
+//		if(bit == 0) {
+//			counter++;
+//		} else {
+//			counter = 0;
+//		}
+//		if(counter == 8) {
+//			ended = 1;
+//		}
+//		if(i%8 == 0) {
+//			counter = 0;
+//		}
+//		i++;
+//	}
 
 	return msg - FILE_LENGTH_SIZE;
 }
@@ -84,15 +84,18 @@ char* recover_lsb4(FILE* in) {
 		hidden = fgetc(in);
 		*(((char*) &size) + i / 2) |= ((hidden & 0x0F) << (4 * ((i + 1) % 2)));
 	}
-	msg = calloc(size + 4, sizeof(char));
-	memcpy(msg, &size, 4);
+
+	//changes size to little endian
+	size = htonl(size);
+	msg = calloc(size + FILE_LENGTH_SIZE, sizeof(char));
+	memcpy(msg, &size, FILE_LENGTH_SIZE);
 	msg += 4;
-	for (i = 0; i < (size - 4) * 2; i++) {
+	for (i = 0; i < (size - FILE_LENGTH_SIZE) * 2; i++) {
 		hidden = fgetc(in);
 		*(msg + i / 2) |= ((hidden & 0x0F) << (4 * ((i + 1) % 2)));
 	}
 	msg[i / 2] = 0;
-	return msg - 4;
+	return msg - FILE_LENGTH_SIZE;
 }
 
 char* recover_lsbe(FILE* in) {
@@ -105,11 +108,14 @@ char* recover_lsbe(FILE* in) {
 			i++;
 		}
 	}
-	msg = calloc(size + 4, sizeof(char));
-	memcpy(msg, &size, 4);
-	msg += 4;
+
+	//changes size to little endian
+	size = htonl(size);
+	msg = calloc(size + BITS_PER_BYTE, sizeof(char));
+	memcpy(msg, &size, BITS_PER_BYTE);
+	msg += BITS_PER_BYTE;
 	i = 0;
-	while (i < (size - 4) * 8) {
+	while (i < (size - FILE_LENGTH_SIZE) * BITS_PER_BYTE) {
 		hidden = fgetc(in);
 		if (hidden == 255 || hidden == 254) {
 			*(msg + i / 8) |= ((hidden & 1) << 7 - (i % 8));
@@ -117,5 +123,5 @@ char* recover_lsbe(FILE* in) {
 		}
 	}
 	msg[i / 8] = 0;
-	return msg - 4;
+	return msg - FILE_LENGTH_SIZE;
 }
