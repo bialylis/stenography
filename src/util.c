@@ -76,7 +76,7 @@ int get_algorithm(const char* string) {
 }
 
 char* preappend_size(char* msg) {
-	int length = strlen(msg) + 4;
+	int length = strlen(msg) + FILE_LENGTH_SIZE;
 	char* out = malloc(length);
 	char c, *p = out, i;
 	p += FILE_LENGTH_SIZE;
