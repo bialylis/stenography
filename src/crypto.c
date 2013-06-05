@@ -6,10 +6,10 @@
 
 EVP_CIPHER * get_evp_algorithm(const char*algorithm, const char * mode);
 
-int encrypt(char * original, unsigned long * encrypted_size, const char* algorithm, const char * mode,
+char * encrypt(char * original, int * encrypted_size, const char* algorithm, const char * mode,
 		const char * pass) {
 
-unsigned char key[16];
+	unsigned char key[16];
 	//hacer malloc de lo que deuvle la context->key length
 	unsigned char iv[16];
 
@@ -17,7 +17,7 @@ unsigned char key[16];
 
 	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass),1, key, iv);
 
-	unsigned char *out = calloc(original_size+16+1,sizeof(char));
+	char *out = calloc(strlen(original)+16+1,sizeof(char));
 	int out_partial_size = 0;
 	int out_size = 0;
 
@@ -25,14 +25,14 @@ unsigned char key[16];
 	EVP_CIPHER_CTX ctx;
 	EVP_CIPHER_CTX_init(&ctx);
 	EVP_CipherInit_ex(&ctx, cipher, NULL, key,iv, enc);
-	EVP_CipherUpdate(&ctx, out, &out_partial_size, original, strlen(original_size));
+	EVP_CipherUpdate(&ctx, out, &out_partial_size, original, strlen(original));
 	EVP_CipherFinal_ex(&ctx, out+out_partial_size, encrypted_size);
 
 	EVP_CIPHER_CTX_cleanup(&ctx);
-	return 0;
+	return out;
 }
 
-char * decrypt(char * encrypted, unsigned long * decrypted_size, const char* algorithm, const char * mode,
+char * decrypt(char * encrypted,int * decrypted_size, const char* algorithm, const char * mode,
 		const char * pass) {
 	//hacer malloc de lo que deuvle la context->key length
 	unsigned char key[16];
@@ -43,7 +43,7 @@ char * decrypt(char * encrypted, unsigned long * decrypted_size, const char* alg
 
 	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass),1, key, iv);
 
-	unsigned char *out = calloc(encrypted_size+16+1,sizeof(char));
+	char *out = calloc(strlen(encrypted)+16+1,sizeof(char));
 	int out_partial_size = 0;
 	int out_size = 0;
 	int enc = 1;
@@ -55,7 +55,7 @@ char * decrypt(char * encrypted, unsigned long * decrypted_size, const char* alg
 
 	EVP_CIPHER_CTX_cleanup(&ctx);
 
-	return 0;
+	return out;
 }
 
 EVP_CIPHER * get_evp_algorithm(const char*algorithm, const char * mode){

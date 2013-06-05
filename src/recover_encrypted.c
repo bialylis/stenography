@@ -10,7 +10,7 @@ char * recover_encrypted_lsb1(FILE* in);
 char *  recover_encrypted_lsb4(FILE* in);
 char *  recover_encrypted_lsbe(FILE* in);
 
-char * recover_encrypted_msg(const char* filename, char algorithm) {
+char * recover_encrypted_msg(const char* filename, int algorithm) {
 
 	char* msg;
 	FILE* in = fopen(filename, "rb");
@@ -81,7 +81,7 @@ char *  recover_encrypted_lsb4(FILE* in) {
 }
 
 char * recover_encrypted_lsbe(FILE* in) {
-	char hidden;
+	char hidden, *msg;
 	int i = 0;
 	unsigned long size = 0;
 
@@ -107,7 +107,25 @@ char * recover_encrypted_lsbe(FILE* in) {
 	return msg;
 }
 
-char * parse_decrypted(char * decrypted, unsigned long size){
+char * parse_decrypted(char * decrypted, char **extension, int *extension_size, unsigned long size){
 	char c, *msg;
 	int i =0;
+
+	int *msg_size;
+
+	//debuggear
+	msg_size = (int *)decrypted;
+	*msg_size = htonl(*msg_size);
+
+	msg = calloc(*msg_size, sizeof(char));
+
+	decrypted = decrypted + FILE_LENGTH_SIZE;
+
+	memcpy(msg, decrypted,(*msg_size)*sizeof(char));
+
+	*extension_size = size - *msg_size;
+	decrypted = decrypted + *msg_size;
+	memcpy(*extension, decrypted, (*extension_size)*sizeof(char));
+	
+	return msg;
 }
