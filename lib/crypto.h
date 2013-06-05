@@ -1,10 +1,10 @@
 #ifndef __CRYPTO__
 #define __CRYPTO__
 
-int encrypt(FILE* in, unsigned long size, const char* algorithm, const char * mode,
+char *  encrypt(char * original, unsigned long * encrypted_size, const char* algorithm, const char * mode,
 		const char * pass);
 
-int decrypt(FILE* in, unsigned long size, const char* algorithm, const char * mode,
+char *  decrypt(char * encrypted, unsigned long *decrypted_size, const char* algorithm, const char * mode,
 		const char * pass);
 
 #endif

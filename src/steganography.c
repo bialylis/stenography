@@ -41,32 +41,25 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 	int parsed_steg = get_algorithm(steg);
 	int extension_size = 0;
 	char * extension;
-	char* output;
-//	if (*pass) {
-//		// Desencriptar
-//
-//		int buffer_len = ceil(encrypted_size / 16.0) * 16;
-//		buffer = calloc(1, buffer_len);
-//		memcpy(buffer, recovered+FILE_LENGTH_SIZE, buffer_len);
-//		decrypt(buffer, buffer_len, IV, pass, keysize, a, m);
-//		output = buffer + FILE_LENGTH_SIZE;
-//		printf("Decrypted:%s\n", output);
-//	}
-	char *recovered_encrypted;
-	char* recovered;
-	if (*pass) {
-		recovered_encrypted = recover_encrypted_msg(p, parsed_steg, a, m, pass);
-//		recovered = recover_msg(recovered_encrypted, parsed_steg,
-//				&extension_size, &extension, pass);
-	} else {
-		recovered = recover_msg(p, parsed_steg, &extension_size, &extension);
+	if(*pass){
+		int decrypted_size = 0;
+
+		//Stenograph the encrypted message
+		char * recovered_encrypted = recovered_encrypted(p,parsed_steg);
+
+		//Desencrypt the recovered message
+		int decrypted_size = 0;
+		char * decrypted = decrypt(recovered_encrypted, &decrypted_size, a, m, pass);
+		
+		//Parse desencrypted message
+		output = parse_decrypted(decrypted, decrypted_size);
+	}else{
+		char* recovered = recover_msg(p, parsed_steg, &extension_size, &extension);
+		output = recovered + FILE_LENGTH_SIZE;
 	}
-	int encrypted_size = *((int*) recovered);
+
 	printf("Size recovered: %d - Extension: %s\n", *((int*) recovered),
 			extension);
-	if (!*pass) {
-		output = recovered + 4;
-	}
 
 	char * new_out = calloc(strlen(out) + extension_size, sizeof(char*));
 	memcpy(new_out, out, strlen(out)*sizeof(char*));

@@ -6,39 +6,37 @@
 #include "../lib/crypto.h"
 #include "../lib/recover_encrypted.h"
 
-int recover_encrypted_lsb1(FILE* in);
-int recover_encrypted_lsb4(FILE* in);
-int recover_encrypted_lsbe(FILE* in);
+char * recover_encrypted_lsb1(FILE* in);
+char *  recover_encrypted_lsb4(FILE* in);
+char *  recover_encrypted_lsbe(FILE* in);
 
-char * recover_encrypted_msg(const char* filename, char algorithm,
-		const char * encrypt_algorithm, const char *encrypt_mode, const char * pass) {
+char * recover_encrypted_msg(const char* filename, char algorithm) {
+
 	char* msg;
 	FILE* in = fopen(filename, "rb");
 
 	//Skip header bytes
 	fseek(in, HEADER_BYTES, SEEK_SET);
 
-	unsigned long encrypted_size = 0;
 	switch (algorithm) {
 	case LSB1:
-		encrypted_size = recover_encrypted_lsb1(in);
+		msg = recover_encrypted_lsb1(in);
 		break;
 	case LSB4:
-		encrypted_size = recover_encrypted_lsb4(in);
+		msg = recover_encrypted_lsb4(in);
 		break;
 	case LSBE:
-		encrypted_size = recover_encrypted_lsbe(in);
+		msg = recover_encrypted_lsbe(in);
 		break;
 	}
-	//return msg
-	 decrypt(in, encrypted_size, encrypt_algorithm, encrypt_mode, pass);
 	fclose(in);
 	return msg;
 }
 
-int recover_encrypted_lsb1(FILE* in) {
+char *  recover_encrypted_lsb1(FILE* in) {
 	char hidden;
 	int i = 0;
+	char * msg;
 	unsigned long size = 0;
 
 	//Recovers encrypted size: Reads the first FILE_LENGTH_SIZE
@@ -47,10 +45,20 @@ int recover_encrypted_lsb1(FILE* in) {
 		*(((char*) &size) + i / 8) |= LSB1_RECOVER(hidden, i);
 	}
 	size = htonl(size);
-	return size;
+	msg = calloc(size, sizeof(char));
+
+	//Recover the hidden encrypted message
+	for (i = 0; i < size * BITS_PER_BYTE; i++) {
+		hidden = fgetc(in);
+		*(msg + i / 8) |= LSB1_RECOVER(hidden,i)
+		;
+	}
+	msg[i / 8] = 0;
+	return msg;
 }
-int recover_encrypted_lsb4(FILE* in) {
-	char hidden;
+
+char *  recover_encrypted_lsb4(FILE* in) {
+	char hidden, *msg;
 	int i = 0;
 	unsigned long size = 0;
 
@@ -60,9 +68,19 @@ int recover_encrypted_lsb4(FILE* in) {
 		*(((char*) &size) + i / 8) |= LSB4_RECOVER(hidden, i);
 	}
 	size = htonl(size);
-	return size;
+	msg = calloc(size, sizeof(char));
+
+	//Recover the hidden encrypted message
+	for (i = 0; i < size * 2; i++) {
+		hidden = fgetc(in);
+		*(msg + i / 2) |= LSB4_RECOVER(hidden, i)
+		;
+	}
+	msg[i / 2] = 0;
+	return msg;
 }
-int recover_encrypted_lsbe(FILE* in) {
+
+char * recover_encrypted_lsbe(FILE* in) {
 	char hidden;
 	int i = 0;
 	unsigned long size = 0;
@@ -73,5 +91,23 @@ int recover_encrypted_lsbe(FILE* in) {
 		*(((char*) &size) + i / 8) |= LSBE_RECOVER(hidden, i);
 	}
 	size = htonl(size);
-	return size;
+	msg = calloc(size, sizeof(char));
+
+	//Recover the hidden encrypted message
+	i = 0;
+	while (i < size * BITS_PER_BYTE) {
+		hidden = fgetc(in);
+		if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
+			*(msg + i / 8) |= LSBE_RECOVER(hidden,i)
+			;
+			i++;
+		}
+	}
+	msg[i / 8] = 0;
+	return msg;
+}
+
+char * parse_decrypted(char * decrypted, unsigned long size){
+	char c, *msg;
+	int i =0;
 }
