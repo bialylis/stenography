@@ -45,7 +45,7 @@ char * recover_encrypted_lsb1(FILE* in) {
 		*(((char*) &size) + i / 8) |= LSB1_RECOVER(hidden, i)
 		;
 	}
-	size = htonl(size);
+	size = ntohl(size);
 	msg = calloc(size+FILE_LENGTH_SIZE, sizeof(char));
 	memcpy(msg, &size, FILE_LENGTH_SIZE);
 		msg += FILE_LENGTH_SIZE;
@@ -57,7 +57,7 @@ char * recover_encrypted_lsb1(FILE* in) {
 		;
 	}
 	msg[i / 8] = 0;
-	return msg;
+	return msg - FILE_LENGTH_SIZE;
 }
 
 char * recover_encrypted_lsb4(FILE* in) {
@@ -71,7 +71,7 @@ char * recover_encrypted_lsb4(FILE* in) {
 		*(((char*) &size) + i / 2) |= LSB4_RECOVER(hidden, i)
 		;
 	}
-	size = htonl(size);
+	size = ntohl(size);
 	msg = calloc(size+FILE_LENGTH_SIZE, sizeof(char));
 	memcpy(msg, &size, FILE_LENGTH_SIZE);
 		msg += FILE_LENGTH_SIZE;
@@ -97,7 +97,7 @@ char * recover_encrypted_lsbe(FILE* in) {
 		*(((char*) &size) + i / 8) |= LSBE_RECOVER(hidden, i)
 		;
 	}
-	size = htonl(size);
+	size = ntohl(size);
 	msg = calloc(size+FILE_LENGTH_SIZE, sizeof(char));
 	memcpy(msg, &size, FILE_LENGTH_SIZE);
 		msg += FILE_LENGTH_SIZE;
@@ -121,7 +121,7 @@ char * parse_decrypted(char * decrypted, char **extension, int *extension_size,
 	char c, *msg;
 	int i = 0;
 	int msg_size = *((int *)decrypted);
-	msg_size = htonl(msg_size);
+	msg_size = ntohl(msg_size);
 	msg = calloc(msg_size + FILE_LENGTH_SIZE,sizeof(char));
 	memcpy(msg, &msg_size, FILE_LENGTH_SIZE*sizeof(char));
 

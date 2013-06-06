@@ -173,7 +173,7 @@ char * preappend_recovered_size(unsigned long *size) {
 	char *msg;
 
 	//Changes size to little endian
-	*size = htonl(*size);
+	*size = ntohl(*size);
 	msg = calloc(*size + FILE_LENGTH_SIZE, sizeof(char));
 	memcpy(msg, size, FILE_LENGTH_SIZE);
 	msg += FILE_LENGTH_SIZE;

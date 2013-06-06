@@ -1,4 +1,6 @@
 #include <openssl/evp.h>
+#include <openssl/aes.h>
+#include <openssl/des.h>
 #include "string.h"
 #include <stdio.h>
 #include "../lib/util.h"
@@ -12,10 +14,9 @@
 const EVP_CIPHER * get_evp_algorithm(const char*algorithm, const char * mode);
 
 char * encrypt(char * original, int * encrypted_size, const char* algorithm,
-		const char * mode, const char * pass) {
+		const char * mode, const char * pass, int original_size) {
 
 	const EVP_CIPHER *cipher = get_evp_algorithm(algorithm, mode);
-
 	unsigned char *key = malloc(
 			sizeof(unsigned char) * EVP_CIPHER_key_length(cipher));
 	unsigned char *iv = malloc(
@@ -23,29 +24,32 @@ char * encrypt(char * original, int * encrypted_size, const char* algorithm,
 
 	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass), 1, key, iv);
 
-	char *out = calloc(*((int*) original) + 16 + 1, sizeof(char));
-	int out_partial_size1 = 0;
-	int out_partial_size2 = 0;
+	char *out = calloc(original_size+AES_BLOCK_SIZE + EVP_MAX_IV_LENGTH, sizeof(char));
+	int length_partial = 0, length = 0;
 
 	EVP_CIPHER_CTX ctx;
 	EVP_CIPHER_CTX_init(&ctx);
 	if (EVP_CipherInit_ex(&ctx, cipher, NULL, key, iv, ENCRYPT) == ERROR) {
 		printf("error");
 	}
-	if (EVP_CipherUpdate(&ctx, out, &out_partial_size1, original,
-			*((int*) original)) == ERROR) {
-		printf("error");
-	}
-	if (EVP_CipherFinal_ex(&ctx, out + out_partial_size1,
-			&out_partial_size2) == ERROR) {
+	if (EVP_CipherUpdate(&ctx, out, &length_partial, original,
+			original_size) == ERROR) {
 		printf("error");
 	}
 
+	length = length_partial;
+
+	if (EVP_CipherFinal_ex(&ctx, out + length_partial,
+			&length) == ERROR) {
+		printf("error");
+	}
+
+	length += length_partial;
+	*encrypted_size = length;
 	if (EVP_CIPHER_CTX_cleanup(&ctx) == ERROR) {
 		printf("error");
 	}
 
-	*encrypted_size = out_partial_size1 + out_partial_size2;
 	return out;
 }
 

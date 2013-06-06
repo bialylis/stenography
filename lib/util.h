@@ -32,7 +32,7 @@ char get_nibble(char* bytes, int n);
 /* Parse methods */
 
 int get_algorithm(const char* string);
-char* parse_message(const char* filename);
+char* parse_message(const char* filename, int* length);
 char* preappend_size(char* msg);
 
 #endif

@@ -12,22 +12,28 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 		const char * a, const char * m, const char * pass) {
 	char* IV = "AAAAAAAAAAAAAAAA";
 	int keysize = 16; /* 128 bits */
-	char* msg = parse_message(in);
+	int length =0;
+	char* msg = parse_message(in,&length);
 
 	//Message new size
 	int size = *((int*) msg);
-	printf("Hidden size: %d\n", size);
-
+	printf("Hidden size: %d\n", ntohl(size));
 	if (*pass) {
 		int encrypted_size = 0;
-		char * encrypted = (unsigned char*)encrypt(msg, &encrypted_size, a, m, pass);
+		char * encrypted = (unsigned char*)encrypt(msg, &encrypted_size, a, m, pass,length);
 		msg = calloc(encrypted_size + FILE_LENGTH_SIZE, sizeof(char));
+		encrypted_size = ntohl(encrypted_size);
 		memcpy(msg, &encrypted_size, FILE_LENGTH_SIZE*sizeof(char));
+		encrypted_size = ntohl(encrypted_size);
 		memcpy(msg+FILE_LENGTH_SIZE, encrypted, encrypted_size*sizeof(char));
+		length = encrypted_size;
 	}
-	hide_message(p, msg, out, get_algorithm(steg));
+	hide_message(p, msg, out, get_algorithm(steg), length);
 	return 0;
 }
+
+// 15 || texto a ocultar || .txt ok ==> 24
+// pepe || enc(15 || texto a ocultar ||  .txt) => encrypted_size
 
 int ext(const char * p, const char * out, const char * steg, const char * a,
 		const char * m, const char * pass) {
