@@ -58,26 +58,25 @@ char * decrypt(char * encrypted, int * decrypted_size, const char* algorithm,
 	unsigned char *iv = malloc(
 			sizeof(unsigned char) * EVP_CIPHER_iv_length(cipher));
 
-	printf("%d", strlen(pass));
 	if (EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass), 1, key,
 			iv)==ERROR) {
 		printf("error");
 	}
 
-	unsigned char *out = calloc(*((int*) encrypted) + 16 + 1, sizeof(char));
+	char *out = calloc(*((int*) encrypted) + 16 + 1, sizeof(char));
 	int out_partial_size1 = 0;
 	int out_partial_size2 = 0;
 	int out_size = 0;
 	EVP_CIPHER_CTX ctx;
 	EVP_CIPHER_CTX_init(&ctx);
-	if (EVP_CipherInit_ex(&ctx, cipher, NULL, key, iv, DECRYPT) == ERROR) {
+	if (EVP_DecryptInit_ex(&ctx, cipher, NULL, key, iv) == ERROR) {
 		printf("error");
 	}
-	if (EVP_CipherUpdate(&ctx, out, &out_partial_size1, encrypted,
+	if (EVP_DecryptUpdate(&ctx, out, &out_partial_size1, encrypted,
 			*((int*) encrypted)) == ERROR) {
 		printf("error");
 	}
-	if (EVP_CipherFinal_ex(&ctx, out + out_partial_size1,
+	if (EVP_DecryptFinal_ex(&ctx, out + out_partial_size1,
 			&out_partial_size2) == ERROR) {
 		printf("error");
 	}

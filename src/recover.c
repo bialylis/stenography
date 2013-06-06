@@ -20,7 +20,6 @@ char* recover_msg(const char* filename, char algorithm, int * extension_size,
 	//Skip header bytes
 	fseek(in, HEADER_BYTES, SEEK_SET);
 
-	unsigned long encrypted_size = 0;
 	switch (algorithm) {
 	case LSB1:
 		msg = recover_lsb1(in, extension_size, extension);

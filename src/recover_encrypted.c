@@ -46,7 +46,9 @@ char * recover_encrypted_lsb1(FILE* in) {
 		;
 	}
 	size = htonl(size);
-	msg = calloc(size, sizeof(char));
+	msg = calloc(size+FILE_LENGTH_SIZE, sizeof(char));
+	memcpy(msg, &size, FILE_LENGTH_SIZE);
+		msg += FILE_LENGTH_SIZE;
 
 	//Recover the hidden encrypted message
 	for (i = 0; i < size * BITS_PER_BYTE; i++) {
@@ -70,7 +72,9 @@ char * recover_encrypted_lsb4(FILE* in) {
 		;
 	}
 	size = htonl(size);
-	msg = calloc(size, sizeof(char));
+	msg = calloc(size+FILE_LENGTH_SIZE, sizeof(char));
+	memcpy(msg, &size, FILE_LENGTH_SIZE);
+		msg += FILE_LENGTH_SIZE;
 
 	//Recover the hidden encrypted message
 	for (i = 0; i < size * 2; i++) {
@@ -94,7 +98,9 @@ char * recover_encrypted_lsbe(FILE* in) {
 		;
 	}
 	size = htonl(size);
-	msg = calloc(size, sizeof(char));
+	msg = calloc(size+FILE_LENGTH_SIZE, sizeof(char));
+	memcpy(msg, &size, FILE_LENGTH_SIZE);
+		msg += FILE_LENGTH_SIZE;
 
 	//Recover the hidden encrypted message
 	i = 0;

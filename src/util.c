@@ -17,7 +17,7 @@ char* parse_message(const char* filename) {
 	FILE* in = fopen(filename, "r");
 	char* extension = parse_extension(filename);
 	int size = get_file_size(filename);
-
+	size = ntohl(size);
 	// Length = 4 (para el tamaño del archivo) + longitud archivo + longitud extension + 1 ('\0')
 	int length = FILE_LENGTH_SIZE + size + strlen(extension) + 1;
 
