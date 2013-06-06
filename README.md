@@ -5,7 +5,7 @@ The following libraries must be installed:
 and then build executing make
 
 
-Examples:
+Example1:
 
 //JPG 135054 bytes
 ./stegobmp --extract  -p resources/example/loimposibleE.bmp -o resources/example/out/salida1 -s LSBE
@@ -20,4 +20,11 @@ Examples:
 
 
 ./stegobmp --extract -p resources/example/sherlock4aes256ofb.bmp -o resources/example/out/salida4  -s LSB4 -a aes256 -m ofb --pass secreto
+
+Example2:
+
+//WMV
+./stegobmp --extract  -p resources/example2/loimposible.bmp -o resources/example2/out/salida1 -s LSB1
+
+
 

@@ -18,4 +18,4 @@
 VagrantFile
 .vagrant/
 .DS_Store
-resources/example/out/
+resources/example*/out/

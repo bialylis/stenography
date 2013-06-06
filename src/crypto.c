@@ -23,17 +23,29 @@ char * encrypt(char * original, int * encrypted_size, const char* algorithm,
 
 	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass), 1, key, iv);
 
-	char *out = calloc(strlen(original) + 16 + 1, sizeof(char));
-	int out_partial_size = 0;
-	int out_size = 0;
+	char *out = calloc(*((int*) original) + 16 + 1, sizeof(char));
+	int out_partial_size1 = 0;
+	int out_partial_size2 = 0;
 
 	EVP_CIPHER_CTX ctx;
 	EVP_CIPHER_CTX_init(&ctx);
-	EVP_CipherInit_ex(&ctx, cipher, NULL, key, iv, ENCRYPT);
-	EVP_CipherUpdate(&ctx, out, &out_partial_size, original, strlen(original));
-	EVP_CipherFinal_ex(&ctx, out + out_partial_size, encrypted_size);
+	if (EVP_CipherInit_ex(&ctx, cipher, NULL, key, iv, ENCRYPT) == ERROR) {
+		printf("error");
+	}
+	if (EVP_CipherUpdate(&ctx, out, &out_partial_size1, original,
+			*((int*) original)) == ERROR) {
+		printf("error");
+	}
+	if (EVP_CipherFinal_ex(&ctx, out + out_partial_size1,
+			&out_partial_size2) == ERROR) {
+		printf("error");
+	}
 
-	EVP_CIPHER_CTX_cleanup(&ctx);
+	if (EVP_CIPHER_CTX_cleanup(&ctx) == ERROR) {
+		printf("error");
+	}
+
+	*encrypted_size = out_partial_size1 + out_partial_size2;
 	return out;
 }
 
@@ -46,14 +58,17 @@ char * decrypt(char * encrypted, int * decrypted_size, const char* algorithm,
 	unsigned char *iv = malloc(
 			sizeof(unsigned char) * EVP_CIPHER_iv_length(cipher));
 
-	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass), 1, key, iv);
+	printf("%d", strlen(pass));
+	if (EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass), 1, key,
+			iv)==ERROR) {
+		printf("error");
+	}
 
 	unsigned char *out = calloc(*((int*) encrypted) + 16 + 1, sizeof(char));
 	int out_partial_size1 = 0;
 	int out_partial_size2 = 0;
 	int out_size = 0;
 	EVP_CIPHER_CTX ctx;
-	int out_final_size = 0;
 	EVP_CIPHER_CTX_init(&ctx);
 	if (EVP_CipherInit_ex(&ctx, cipher, NULL, key, iv, DECRYPT) == ERROR) {
 		printf("error");
