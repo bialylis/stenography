@@ -4,100 +4,121 @@
 #include "../lib/util.h"
 #include "../lib/crypto.h"
 
-EVP_CIPHER * get_evp_algorithm(const char*algorithm, const char * mode);
+#define ENCRYPT 1
+#define DECRYPT 0
+#define SUCCESS 1
+#define ERROR 0
 
-char * encrypt(char * original, int * encrypted_size, const char* algorithm, const char * mode,
-		const char * pass) {
+const EVP_CIPHER * get_evp_algorithm(const char*algorithm, const char * mode);
 
-	unsigned char key[16];
-	//hacer malloc de lo que deuvle la context->key length
-	unsigned char iv[16];
+char * encrypt(char * original, int * encrypted_size, const char* algorithm,
+		const char * mode, const char * pass) {
 
-	EVP_CIPHER *cipher = get_evp_algorithm(algorithm,mode);
+	const EVP_CIPHER *cipher = get_evp_algorithm(algorithm, mode);
 
-	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass),1, key, iv);
+	unsigned char *key = malloc(
+			sizeof(unsigned char) * EVP_CIPHER_key_length(cipher));
+	unsigned char *iv = malloc(
+			sizeof(unsigned char) * EVP_CIPHER_iv_length(cipher));
 
-	char *out = calloc(strlen(original)+16+1,sizeof(char));
+	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass), 1, key, iv);
+
+	char *out = calloc(strlen(original) + 16 + 1, sizeof(char));
 	int out_partial_size = 0;
 	int out_size = 0;
 
-	int enc = 0;
 	EVP_CIPHER_CTX ctx;
 	EVP_CIPHER_CTX_init(&ctx);
-	EVP_CipherInit_ex(&ctx, cipher, NULL, key,iv, enc);
+	EVP_CipherInit_ex(&ctx, cipher, NULL, key, iv, ENCRYPT);
 	EVP_CipherUpdate(&ctx, out, &out_partial_size, original, strlen(original));
-	EVP_CipherFinal_ex(&ctx, out+out_partial_size, encrypted_size);
+	EVP_CipherFinal_ex(&ctx, out + out_partial_size, encrypted_size);
 
 	EVP_CIPHER_CTX_cleanup(&ctx);
 	return out;
 }
 
-char * decrypt(char * encrypted,int * decrypted_size, const char* algorithm, const char * mode,
-		const char * pass) {
-	//hacer malloc de lo que deuvle la context->key length
-	unsigned char key[16];
-	//hacer malloc de lo que deuvle la context->key length
-	unsigned char iv[16];
+char * decrypt(char * encrypted, int * decrypted_size, const char* algorithm,
+		const char * mode, const char * pass) {
 
-	EVP_CIPHER *cipher = get_evp_algorithm(algorithm,mode);
+	const EVP_CIPHER *cipher = get_evp_algorithm(algorithm, mode);
+	unsigned char *key = malloc(
+			sizeof(unsigned char) * EVP_CIPHER_key_length(cipher));
+	unsigned char *iv = malloc(
+			sizeof(unsigned char) * EVP_CIPHER_iv_length(cipher));
 
-	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass),1, key, iv);
+	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass), 1, key, iv);
 
-	char *out = calloc(strlen(encrypted)+16+1,sizeof(char));
-	int out_partial_size = 0;
+	unsigned char *out = calloc(*((int*) encrypted) + 16 + 1, sizeof(char));
+	int out_partial_size1 = 0;
+	int out_partial_size2 = 0;
 	int out_size = 0;
-	int enc = 1;
 	EVP_CIPHER_CTX ctx;
+	int out_final_size = 0;
 	EVP_CIPHER_CTX_init(&ctx);
-	EVP_CipherInit_ex(&ctx, cipher, NULL, key,iv, enc);
-	EVP_CipherUpdate(&ctx, out, &out_partial_size, encrypted, strlen(encrypted));
-	EVP_CipherFinal_ex(&ctx, out+out_partial_size, decrypted_size);
+	if (EVP_CipherInit_ex(&ctx, cipher, NULL, key, iv, DECRYPT) == ERROR) {
+		printf("error");
+	}
+	if (EVP_CipherUpdate(&ctx, out, &out_partial_size1, encrypted,
+			*((int*) encrypted)) == ERROR) {
+		printf("error");
+	}
+	if (EVP_CipherFinal_ex(&ctx, out + out_partial_size1,
+			&out_partial_size2) == ERROR) {
+		printf("error");
+	}
 
-	EVP_CIPHER_CTX_cleanup(&ctx);
+	if (EVP_CIPHER_CTX_cleanup(&ctx) == ERROR) {
+		printf("error");
+	}
 
+	*decrypted_size = out_partial_size1 + out_partial_size2;
 	return out;
 }
 
-EVP_CIPHER * get_evp_algorithm(const char*algorithm, const char * mode){
-	if(strcmp(algorithm, AES_128)==0){
-		if(strcmp(mode, ECB)==0){
-			return EVP_get_cipherbyname("aes_128_ecb");
-		}else if(strcmp(mode, CFB)==0){
-			return EVP_get_cipherbyname("aes_128_cfb");
-		}else if(strcmp(mode, OFB)==0){
-			return EVP_get_cipherbyname("aes_128_ofb");
-		}else if(strcmp(mode, CBC)==0){
-			return EVP_get_cipherbyname("aes_128_cbc");
+const EVP_CIPHER * get_evp_algorithm(const char*algorithm, const char * mode) {
+	OpenSSL_add_all_ciphers();
+
+	if (strcmp(algorithm, AES_128) == 0) {
+		if (strcmp(mode, ECB) == 0) {
+			return EVP_get_cipherbyname("aes-128-ecb");
+		} else if (strcmp(mode, CFB) == 0) {
+			return EVP_get_cipherbyname("aes-128-cfb");
+		} else if (strcmp(mode, OFB) == 0) {
+			return EVP_get_cipherbyname("aes-128-ofb");
+		} else if (strcmp(mode, CBC) == 0) {
+			return EVP_get_cipherbyname("aes-128-cbc");
 		}
-	}else if(strcmp(algorithm, AES_192)==0){
-		if(strcmp(mode, ECB)==0){
-			return EVP_get_cipherbyname("aes_192_ecb");
-		}else if(strcmp(mode, CFB)==0){
-			return EVP_get_cipherbyname("aes_192_cfb");
-		}else if(strcmp(mode, OFB)==0){
-			return EVP_get_cipherbyname("aes_192_ofb");
-		}else if(strcmp(mode, CBC)==0){
-			return EVP_get_cipherbyname("aes_192_cbc");
+	} else if (strcmp(algorithm, AES_192) == 0) {
+		if (strcmp(mode, ECB) == 0) {
+			return EVP_get_cipherbyname("aes-192-ecb");
+		} else if (strcmp(mode, CFB) == 0) {
+			return EVP_get_cipherbyname("aes-192-cfb");
+		} else if (strcmp(mode, OFB) == 0) {
+			return EVP_get_cipherbyname("aes-192-ofb");
+		} else if (strcmp(mode, CBC) == 0) {
+			return EVP_get_cipherbyname("aes-192-cbc");
 		}
-	}else if(strcmp(algorithm, AES_256)==0){
-		if(strcmp(mode, ECB)==0){
-			return EVP_get_cipherbyname("aes_256_ecb");
-		}else if(strcmp(mode, CFB)==0){
-			return EVP_get_cipherbyname("aes_256_cfb");
-		}else if(strcmp(mode, OFB)==0){
-			return EVP_get_cipherbyname("aes_256_ofb");
-		}else if(strcmp(mode, CBC)){
-			return EVP_get_cipherbyname("aes_256_cbc");
+	} else if (strcmp(algorithm, AES_256) == 0) {
+		if (strcmp(mode, ECB) == 0) {
+			return EVP_get_cipherbyname("aes-256-ecb");
+		} else if (strcmp(mode, CFB) == 0) {
+			return EVP_get_cipherbyname("aes-256-cfb");
+		} else if (strcmp(mode, OFB) == 0) {
+			return EVP_get_cipherbyname("aes-256-ofb");
+		} else if (strcmp(mode, CBC)) {
+			return EVP_get_cipherbyname("aes-256-cbc");
 		}
-	}else if(strcmp(algorithm, DES)==0){
-		if(strcmp(mode, ECB)==0){
-			return EVP_get_cipherbyname("des_ecb");
-		}else if(strcmp(mode, CFB)==0){
-			return EVP_get_cipherbyname("des_cfb");
-		}else if(strcmp(mode, OFB)==0){
-			return EVP_get_cipherbyname("des_ofb");
-		}else if(strcmp(mode, CBC)==0){
-			return EVP_get_cipherbyname("des_cbc");
+	} else if (strcmp(algorithm, DES) == 0) {
+		if (strcmp(mode, ECB) == 0) {
+			return EVP_get_cipherbyname("des-ecb");
+		} else if (strcmp(mode, CFB) == 0) {
+			return EVP_get_cipherbyname("des-cfb");
+		} else if (strcmp(mode, OFB) == 0) {
+			return EVP_get_cipherbyname("des-ofb");
+		} else if (strcmp(mode, CBC) == 0) {
+			return EVP_get_cipherbyname("des-cbc");
 		}
 	}
+
+	return EVP_get_cipherbyname("aes-128-ccb");
 }

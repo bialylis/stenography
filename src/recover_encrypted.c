@@ -7,8 +7,8 @@
 #include "../lib/recover_encrypted.h"
 
 char * recover_encrypted_lsb1(FILE* in);
-char *  recover_encrypted_lsb4(FILE* in);
-char *  recover_encrypted_lsbe(FILE* in);
+char * recover_encrypted_lsb4(FILE* in);
+char * recover_encrypted_lsbe(FILE* in);
 
 char * recover_encrypted_msg(const char* filename, int algorithm) {
 
@@ -33,7 +33,7 @@ char * recover_encrypted_msg(const char* filename, int algorithm) {
 	return msg;
 }
 
-char *  recover_encrypted_lsb1(FILE* in) {
+char * recover_encrypted_lsb1(FILE* in) {
 	char hidden;
 	int i = 0;
 	char * msg;
@@ -42,7 +42,8 @@ char *  recover_encrypted_lsb1(FILE* in) {
 	//Recovers encrypted size: Reads the first FILE_LENGTH_SIZE
 	for (i = 0; i < FILE_LENGTH_SIZE * BITS_PER_BYTE; i++) {
 		hidden = fgetc(in);
-		*(((char*) &size) + i / 8) |= LSB1_RECOVER(hidden, i);
+		*(((char*) &size) + i / 8) |= LSB1_RECOVER(hidden, i)
+		;
 	}
 	size = htonl(size);
 	msg = calloc(size, sizeof(char));
@@ -57,7 +58,7 @@ char *  recover_encrypted_lsb1(FILE* in) {
 	return msg;
 }
 
-char *  recover_encrypted_lsb4(FILE* in) {
+char * recover_encrypted_lsb4(FILE* in) {
 	char hidden, *msg;
 	int i = 0;
 	unsigned long size = 0;
@@ -78,7 +79,7 @@ char *  recover_encrypted_lsb4(FILE* in) {
 		;
 	}
 	msg[i / 2] = 0;
-	return msg;
+	return msg - FILE_LENGTH_SIZE;
 }
 
 char * recover_encrypted_lsbe(FILE* in) {
@@ -89,7 +90,8 @@ char * recover_encrypted_lsbe(FILE* in) {
 	//Recovers encrypted size: Reads the first FILE_LENGTH_SIZE
 	for (i = 0; i < FILE_LENGTH_SIZE * BITS_PER_BYTE; i++) {
 		hidden = fgetc(in);
-		*(((char*) &size) + i / 8) |= LSBE_RECOVER(hidden, i);
+		*(((char*) &size) + i / 8) |= LSBE_RECOVER(hidden, i)
+		;
 	}
 	size = htonl(size);
 	msg = calloc(size, sizeof(char));
@@ -105,28 +107,29 @@ char * recover_encrypted_lsbe(FILE* in) {
 		}
 	}
 	msg[i / 8] = 0;
-	return msg;
+	return msg - FILE_LENGTH_SIZE;
 }
 
-char * parse_decrypted(char * decrypted, char **extension, int *extension_size, unsigned long size){
+char * parse_decrypted(char * decrypted, char **extension, int *extension_size,
+		unsigned long size) {
 	char c, *msg;
-	int i =0;
+	int i = 0;
 
 	int *msg_size;
 
 	//debuggear
-	msg_size = (int *)decrypted;
-	*msg_size = htonl(*msg_size);
+	msg_size = (int *) decrypted;
+//	*msg_size = htonl(*msg_size);
 
 	msg = calloc(*msg_size, sizeof(char));
 
 	decrypted = decrypted + FILE_LENGTH_SIZE;
 
-	memcpy(msg, decrypted,(*msg_size)*sizeof(char));
+	memcpy(msg, decrypted, (*msg_size)*sizeof(char));
 
 	*extension_size = size - *msg_size;
 	decrypted = decrypted + *msg_size;
 	memcpy(*extension, decrypted, (*extension_size)*sizeof(char));
-	
-	return msg;
+
+	return msg - FILE_LENGTH_SIZE;
 }
