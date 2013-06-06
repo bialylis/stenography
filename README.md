@@ -18,7 +18,8 @@ Example1:
 //MP3 2348246 bytes
 ./stegobmp --extract -p resources/example/sherlock4.bmp -o resources/example/out/salida3  -s LSB4
 
-
+//MP3 2348246 bytes
+Encripción: 2348255 bytes
 ./stegobmp --extract -p resources/example/sherlock4aes256ofb.bmp -o resources/example/out/salida4  -s LSB4 -a aes256 -m ofb --pass secreto
 
 Example2:
