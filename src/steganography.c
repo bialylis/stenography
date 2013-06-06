@@ -20,7 +20,7 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 
 	if (*pass) {
 		int encrypted_size = 0;
-		char * encrypted = encrypt(msg, &encrypted_size, a, m, pass);
+		char * encrypted = (unsigned char*)encrypt(msg, &encrypted_size, a, m, pass);
 		msg = calloc(encrypted_size + FILE_LENGTH_SIZE, sizeof(char));
 		memcpy(msg, &encrypted_size, FILE_LENGTH_SIZE*sizeof(char));
 		memcpy(msg+FILE_LENGTH_SIZE, encrypted, encrypted_size*sizeof(char));
@@ -46,7 +46,7 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 
 		//Desencrypt the recovered message
 		int decrypted_size = 0;
-		char * decrypted = decrypt(recovered_encrypted, &decrypted_size, a, m,
+		char * decrypted = (unsigned char*)decrypt(recovered_encrypted, &decrypted_size, a, m,
 				pass);
 
 		//Parse desencrypted message

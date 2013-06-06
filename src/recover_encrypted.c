@@ -120,13 +120,10 @@ char * parse_decrypted(char * decrypted, char **extension, int *extension_size,
 		unsigned long size) {
 	char c, *msg;
 	int i = 0;
-	int msg_size;
-	char *msg_size_string = calloc(FILE_LENGTH_SIZE, sizeof(char));
-	memcpy(msg_size_string, decrypted, FILE_LENGTH_SIZE*sizeof(char));
-	msg_size = atoi(msg_size_string);
-	//debuggear
-//	msg_size = (int *) decrypted;
-//	*msg_size = htonl(*msg_size);
+	int msg_size = *((int *)decrypted);
+	msg_size = htonl(msg_size);
+	msg = calloc(msg_size + FILE_LENGTH_SIZE,sizeof(char));
+	memcpy(msg, &msg_size, FILE_LENGTH_SIZE*sizeof(char));
 
 	msg = calloc(msg_size, sizeof(char));
 
@@ -136,6 +133,7 @@ char * parse_decrypted(char * decrypted, char **extension, int *extension_size,
 
 	*extension_size = size - msg_size;
 	decrypted = decrypted + msg_size;
+	*extension = calloc(*extension_size,sizeof(char));
 	memcpy(*extension, decrypted, (*extension_size)*sizeof(char));
 
 	return msg - FILE_LENGTH_SIZE;

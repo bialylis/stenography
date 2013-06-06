@@ -63,29 +63,32 @@ char * decrypt(char * encrypted, int * decrypted_size, const char* algorithm,
 		printf("error");
 	}
 
-	char *out = calloc(*((int*) encrypted) + 16 + 1, sizeof(char));
-	int out_partial_size1 = 0;
-	int out_partial_size2 = 0;
-	int out_size = 0;
+	char *out = calloc(*((int*) encrypted), sizeof(char));
+	int length_partial = 0, length = 0;
 	EVP_CIPHER_CTX ctx;
 	EVP_CIPHER_CTX_init(&ctx);
 	if (EVP_DecryptInit_ex(&ctx, cipher, NULL, key, iv) == ERROR) {
 		printf("error");
 	}
-	if (EVP_DecryptUpdate(&ctx, out, &out_partial_size1, encrypted,
+
+
+	if (EVP_DecryptUpdate(&ctx, out, &length_partial, encrypted+FILE_LENGTH_SIZE,
 			*((int*) encrypted)) == ERROR) {
 		printf("error");
 	}
-	if (EVP_DecryptFinal_ex(&ctx, out + out_partial_size1,
-			&out_partial_size2) == ERROR) {
+
+	length = length_partial;
+	if (EVP_DecryptFinal_ex(&ctx, out + length,
+			&length_partial) == ERROR) {
 		printf("error");
 	}
+	length += length_partial;
+	*decrypted_size = length;
 
 	if (EVP_CIPHER_CTX_cleanup(&ctx) == ERROR) {
 		printf("error");
 	}
 
-	*decrypted_size = out_partial_size1 + out_partial_size2;
 	return out;
 }
 
