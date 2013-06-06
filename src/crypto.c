@@ -60,44 +60,44 @@ char * decrypt(char * encrypted,int * decrypted_size, const char* algorithm, con
 
 EVP_CIPHER * get_evp_algorithm(const char*algorithm, const char * mode){
 	if(strcmp(algorithm, AES_128)==0){
-		if(strcmp(mode, ECB)){
+		if(strcmp(mode, ECB)==0){
+			return EVP_get_cipherbyname("aes_128_ecb");
+		}else if(strcmp(mode, CFB)==0){
+			return EVP_get_cipherbyname("aes_128_cfb");
+		}else if(strcmp(mode, OFB)==0){
+			return EVP_get_cipherbyname("aes_128_ofb");
+		}else if(strcmp(mode, CBC)==0){
 			return EVP_get_cipherbyname("aes_128_cbc");
-		}else if(strcmp(mode, CFB)){
-			return EVP_get_cipherbyname("aes_128_des");
-		}else if(strcmp(mode, OFB)){
-			return EVP_get_cipherbyname("aes_128_des");
-		}else if(strcmp(mode, CBC)){
-			return EVP_get_cipherbyname("aes_128_des");
 		}
 	}else if(strcmp(algorithm, AES_192)==0){
-		if(strcmp(mode, ECB)){
-			return EVP_get_cipherbyname("aes_128_cbc");
-		}else if(strcmp(mode, CFB)){
-			return EVP_get_cipherbyname("aes_128_des");
-		}else if(strcmp(mode, OFB)){
-			return EVP_get_cipherbyname("aes_128_des");
-		}else if(strcmp(mode, CBC)){
-			return EVP_get_cipherbyname("aes_128_des");
+		if(strcmp(mode, ECB)==0){
+			return EVP_get_cipherbyname("aes_192_ecb");
+		}else if(strcmp(mode, CFB)==0){
+			return EVP_get_cipherbyname("aes_192_cfb");
+		}else if(strcmp(mode, OFB)==0){
+			return EVP_get_cipherbyname("aes_192_ofb");
+		}else if(strcmp(mode, CBC)==0){
+			return EVP_get_cipherbyname("aes_192_cbc");
 		}
 	}else if(strcmp(algorithm, AES_256)==0){
-		if(strcmp(mode, ECB)){
-			return EVP_get_cipherbyname("aes_128_cbc");
-		}else if(strcmp(mode, CFB)){
-			return EVP_get_cipherbyname("aes_128_des");
-		}else if(strcmp(mode, OFB)){
-			return EVP_get_cipherbyname("aes_128_des");
+		if(strcmp(mode, ECB)==0){
+			return EVP_get_cipherbyname("aes_256_ecb");
+		}else if(strcmp(mode, CFB)==0){
+			return EVP_get_cipherbyname("aes_256_cfb");
+		}else if(strcmp(mode, OFB)==0){
+			return EVP_get_cipherbyname("aes_256_ofb");
 		}else if(strcmp(mode, CBC)){
-			return EVP_get_cipherbyname("aes_128_des");
+			return EVP_get_cipherbyname("aes_256_cbc");
 		}
 	}else if(strcmp(algorithm, DES)==0){
-		if(strcmp(mode, ECB)){
-			return EVP_get_cipherbyname("aes_128_cbc");
-		}else if(strcmp(mode, CFB)){
-			return EVP_get_cipherbyname("aes_128_des");
-		}else if(strcmp(mode, OFB)){
-			return EVP_get_cipherbyname("aes_128_des");
-		}else if(strcmp(mode, CBC)){
-			return EVP_get_cipherbyname("aes_128_des");
+		if(strcmp(mode, ECB)==0){
+			return EVP_get_cipherbyname("des_ecb");
+		}else if(strcmp(mode, CFB)==0){
+			return EVP_get_cipherbyname("des_cfb");
+		}else if(strcmp(mode, OFB)==0){
+			return EVP_get_cipherbyname("des_ofb");
+		}else if(strcmp(mode, CBC)==0){
+			return EVP_get_cipherbyname("des_cbc");
 		}
 	}
 }

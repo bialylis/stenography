@@ -63,9 +63,10 @@ char *  recover_encrypted_lsb4(FILE* in) {
 	unsigned long size = 0;
 
 	//Recovers encrypted size: Reads the first FILE_LENGTH_SIZE
-	for (i = 0; i < FILE_LENGTH_SIZE * BITS_PER_BYTE; i++) {
+	for (i = 0; i < FILE_LENGTH_SIZE * 2; i++) {
 		hidden = fgetc(in);
-		*(((char*) &size) + i / 8) |= LSB4_RECOVER(hidden, i);
+		*(((char*) &size) + i / 2) |= LSB4_RECOVER(hidden, i)
+		;
 	}
 	size = htonl(size);
 	msg = calloc(size, sizeof(char));
