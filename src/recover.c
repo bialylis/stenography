@@ -62,7 +62,8 @@ char* recover_lsb1(FILE* in, int *extension_size, char **extension) {
 
 char* recover_lsb4(FILE* in, int *extension_size, char** extension) {
 	char c, hidden, *msg;
-	unsigned long size = 0, i;
+	unsigned long size = 0;
+	int i;
 
 	//Recovers file size: Reads the first FILE_LENGTH_SIZE
 	for (i = 0; i < FILE_LENGTH_SIZE * 2; i++) {
@@ -76,8 +77,8 @@ char* recover_lsb4(FILE* in, int *extension_size, char** extension) {
 	//Recover the hidden message
 	for (i = 0; i < size * 2; i++) {
 		hidden = fgetc(in);
-		*(msg + i / 2) |= LSB4_RECOVER(hidden, i)
-		;
+		printf("(%c - %d)\n",hidden,i);
+		*(msg + i / 2) |= LSB4_RECOVER(hidden, i);
 	}
 	msg[i / 2] = 0;
 
@@ -176,7 +177,7 @@ char * preappend_recovered_size(unsigned long *size) {
 	//Changes size to little endian
 	*size = ntohl(*size);
 	msg = calloc(*size + FILE_LENGTH_SIZE, sizeof(char));
-	memcpy(msg, size, FILE_LENGTH_SIZE);
+	memcpy(msg, size, FILE_LENGTH_SIZE*sizeof(char));
 	msg += FILE_LENGTH_SIZE;
 	return msg;
 }
