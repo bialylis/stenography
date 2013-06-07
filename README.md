@@ -1,3 +1,6 @@
+TP2 Criptografía y Segunidad
+============================
+
 The following libraries must be installed:
   apt-get install libmcrypt-dev
   apt-get install libargtable2-dev
@@ -24,13 +27,14 @@ Encripción: 2348255 bytes
 
 Example2:
 
-//WMV
+//WMV 908KB
 ./stegobmp --extract  -p resources/example2/loimposible.bmp -o resources/example2/out/salida1 -s LSB1
 
-//PNG
+//PNG 42852 bytes => .zip => .txt with instructions
 ./stegobmp --extract  -p resources/example2/ironlady.bmp -o resources/example2/out/salida2 -s LSB4
 
-./stegobmp --extract  -p resources/example2/lincoln.bmp -o resources/example2/out/salida2 -s LSBE
+//PDF 6KB
+./stegobmp --extract  -p resources/example2/hugo.bmp -o resources/example2/out/salida2 -s LSBE
 
 Our examples:
 
@@ -40,13 +44,12 @@ Our examples:
 ./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/ocultado.bmp -s LSB4
 ./stegobmp --extract  -p resources/ocultado.bmp -o resources/mensajeout -s LSB4
 
-
-//NO ANDA
 ./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/ocultado.bmp -s LSBE
 ./stegobmp --extract  -p resources/ocultado.bmp -o resources/mensajeout -s LSBE
 
-./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/ocultado.bmp -s LSB1 -a aes128 -m cbc --pass cripto
-./stegobmp --extract -p resources/ocultado.bmp -o resources/mensajeout  -s LSB1 -a aes128 -m cbc --pass cripto
+//NO ANDA
+./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/ocultado.bmp -s LSB4 -a aes128 -m cbc --pass cripto
+./stegobmp --extract -p resources/ocultado.bmp -o resources/mensajeout  -s LSB4 -a aes128 -m cbc --pass cripto
 
 
 
