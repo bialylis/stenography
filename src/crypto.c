@@ -6,8 +6,6 @@
 #include "../lib/util.h"
 #include "../lib/crypto.h"
 
-#define ENCRYPT 1
-#define DECRYPT 0
 #define SUCCESS 1
 #define ERROR 0
 
@@ -29,17 +27,17 @@ char * encrypt(char * original, int * encrypted_size, const char* algorithm,
 
 	EVP_CIPHER_CTX ctx;
 	EVP_CIPHER_CTX_init(&ctx);
-	if (EVP_CipherInit_ex(&ctx, cipher, NULL, key, iv, ENCRYPT) == ERROR) {
+	if (EVP_EncryptInit_ex(&ctx, cipher, NULL, key, iv) == ERROR) {
 		printf("error");
 	}
-	if (EVP_CipherUpdate(&ctx, out, &length_partial, original,
+	if (EVP_EncryptUpdate(&ctx, out, &length_partial, original,
 			original_size) == ERROR) {
 		printf("error");
 	}
 
 	length = length_partial;
 
-	if (EVP_CipherFinal_ex(&ctx, out + length_partial,
+	if (EVP_EncryptFinal_ex(&ctx, out + length_partial,
 			&length) == ERROR) {
 		printf("error");
 	}

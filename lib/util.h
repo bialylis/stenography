@@ -4,8 +4,8 @@
 #define LSB1 1
 #define LSB4 2
 #define LSBE 3
-#define LSBE_BYTE_SET_1 255
-#define LSBE_BYTE_SET_2 254
+#define LSBE_BYTE_SET_1 (char)0xFF
+#define LSBE_BYTE_SET_2 (char)0xFE
 
 #define HEADER_BYTES 54
 #define FILE_LENGTH_SIZE 4

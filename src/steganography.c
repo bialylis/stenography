@@ -26,7 +26,7 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 		memcpy(msg, &encrypted_size, FILE_LENGTH_SIZE*sizeof(char));
 		encrypted_size = ntohl(encrypted_size);
 		memcpy(msg+FILE_LENGTH_SIZE, encrypted, encrypted_size*sizeof(char));
-		length = encrypted_size;
+		length = encrypted_size+FILE_LENGTH_SIZE;
 	}
 	hide_message(p, msg, out, get_algorithm(steg), length);
 	return 0;
