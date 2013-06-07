@@ -27,6 +27,11 @@ Example2:
 //WMV
 ./stegobmp --extract  -p resources/example2/loimposible.bmp -o resources/example2/out/salida1 -s LSB1
 
+//PNG
+./stegobmp --extract  -p resources/example2/ironlady.bmp -o resources/example2/out/salida2 -s LSB4
+
+./stegobmp --extract  -p resources/example2/lincoln.bmp -o resources/example2/out/salida2 -s LSBE
+
 Our examples:
 
 ./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/ocultado.bmp -s LSB1
