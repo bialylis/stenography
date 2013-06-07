@@ -10,8 +10,6 @@
 
 int emb(const char* in, const char * p, const char * out, const char * steg,
 		const char * a, const char * m, const char * pass) {
-	char* IV = "AAAAAAAAAAAAAAAA";
-	int keysize = 16; /* 128 bits */
 	int length =0;
 	char* msg = parse_message(in,&length);
 
@@ -32,14 +30,8 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 	return 0;
 }
 
-// 15 || texto a ocultar || .txt ok ==> 24
-// pepe || enc(15 || texto a ocultar ||  .txt) => encrypted_size
-
 int ext(const char * p, const char * out, const char * steg, const char * a,
 		const char * m, const char * pass) {
-	char* IV = "AAAAAAAAAAAAAAAA";
-	int keysize = 16; /* 128 bits */
-	char* buffer;
 	int parsed_steg = get_algorithm(steg);
 	int extension_size = 0;
 	char * extension;
@@ -63,9 +55,6 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 		recovered = recover_msg(p, parsed_steg, &extension_size, &extension);
 		output = recovered + FILE_LENGTH_SIZE;
 	}
-
-	// printf("Size recovered: %d - Extension: %s\n", *((int*) recovered),
-	// 		extension);
 
 	char * new_out = calloc(strlen(out) + extension_size, sizeof(char*));
 	memcpy(new_out, out, strlen(out)*sizeof(char*));

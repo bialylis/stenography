@@ -44,8 +44,6 @@ void hide_lsb1(char* msg, FILE*p, FILE* out, int size) {
 	unsigned long bits_qty = size * BITS_PER_BYTE;
 	while (((c = fgetc(p)) || 1) && !feof(p)) {
 		if (i < bits_qty) {
-			// ~1 = 1111110
-			// (c & ~1) will put the last bit in 0
 			hidden = (c & ~1) | get_bit(msg, i);
 			fputc(hidden, out);
 			i++;
@@ -62,7 +60,6 @@ void hide_lsb4(char* msg, FILE*p, FILE* out, int size) {
 	unsigned long i = 0;
 	while (((c = fgetc(p)) || 1) && !feof(p)) {
 		if (i < size * 2) {
-			// c & 11110000
 			hidden = c & 0xF0;
 			hidden |= get_nibble(msg, i);
 			fputc(hidden, out);
