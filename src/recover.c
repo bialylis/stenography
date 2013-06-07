@@ -121,7 +121,8 @@ char* recover_lsbe(FILE* in, int *extension_size, char** extension) {
 
 int recover_extension(FILE *in, char **extension, char algorithm) {
 	int j = 0, ended = 0, counter = 0;
-	char *auxExtension = calloc(30, sizeof(char)), hidden;
+	char *auxExtension = calloc(30, sizeof(char));
+	unsigned char hidden;
 	while (!ended) {
 		if (j % 30 == 0) {
 			auxExtension = realloc(auxExtension, (30 + j) * sizeof(char));
