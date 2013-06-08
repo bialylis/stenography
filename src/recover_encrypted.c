@@ -89,7 +89,8 @@ char * recover_encrypted_lsb4(FILE* in) {
 }
 
 char * recover_encrypted_lsbe(FILE* in) {
-	char hidden, *msg;
+	char *msg;
+	unsigned char hidden;
 	int i = 0;
 	unsigned long size = 0;
 
@@ -109,8 +110,7 @@ char * recover_encrypted_lsbe(FILE* in) {
 	while (i < size * BITS_PER_BYTE) {
 		hidden = fgetc(in);
 		if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
-			*(msg + i / 8) |= LSBE_RECOVER(hidden,i)
-			;
+			*(msg + i / 8) |= LSBE_RECOVER(hidden,i);
 			i++;
 		}
 	}
@@ -127,7 +127,7 @@ char * parse_decrypted(char * decrypted, char **extension, int *extension_size,
 	msg = calloc(msg_size + FILE_LENGTH_SIZE,sizeof(char));
 	memcpy(msg, &msg_size, FILE_LENGTH_SIZE*sizeof(char));
 
-	msg = calloc(msg_size, sizeof(char));
+	// msg = calloc(msg_size, sizeof(char));
 
 	decrypted = decrypted + FILE_LENGTH_SIZE;
 
