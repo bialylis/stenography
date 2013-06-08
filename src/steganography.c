@@ -18,7 +18,7 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 	printf("Hidden size: %d\n", ntohl(size));
 	if (*pass) {
 		int encrypted_size = 0;
-		char * encrypted = (char*)encrypt(msg, &encrypted_size, a, m, pass,length);
+		char * encrypted = (unsigned char*)encrypt(msg, &encrypted_size, a, m, pass,length);
 		msg = calloc(encrypted_size + FILE_LENGTH_SIZE, sizeof(char));
 		encrypted_size = ntohl(encrypted_size);
 		memcpy(msg, &encrypted_size, FILE_LENGTH_SIZE*sizeof(char));
@@ -44,7 +44,7 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 
 		//Decrypt the recovered message
 		int decrypted_size = 0;
-		char * decrypted = (char*)decrypt(recovered_encrypted, &decrypted_size, a, m,
+		char * decrypted = (unsigned char*)decrypt(recovered_encrypted, &decrypted_size, a, m,
 				pass);
 
 		//Parse desencrypted message

@@ -125,7 +125,7 @@ char* recover_lsbe(FILE* in, int *extension_size, char** extension) {
 
 int recover_extension(FILE *in, char **extension, char algorithm) {
 	int j = 0, ended = 0, counter = 0;
-	char *auxExtension = calloc(30, sizeof(char));
+	char *auxExtension = NULL;
 	unsigned char hidden;
 	while (!ended) {
 		if(feof(in)){
@@ -138,21 +138,18 @@ int recover_extension(FILE *in, char **extension, char algorithm) {
 			unsigned char bit;
 			switch (algorithm) {
 				case LSB1:
-					bit = LSB1_RECOVER(hidden, j)
-					;
+					bit = LSB1_RECOVER(hidden, j);
 					*(auxExtension + j / 8) |= bit;
 					j++;
 					break;
 				case LSB4:
-					bit = LSB4_RECOVER(hidden, j)
-					;
+					bit = LSB4_RECOVER(hidden, j);
 					*(auxExtension + j / 2) |= bit;
 					j++;
 					break;
 				case LSBE:
 					if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
-						bit = LSBE_RECOVER(hidden, j)
-						;
+						bit = LSBE_RECOVER(hidden, j);
 						*(auxExtension + j / 8) |= bit;
 						j++;
 					}
