@@ -132,7 +132,7 @@ int recover_extension(FILE *in, char **extension, char algorithm) {
 			ended = 1;
 		} else {
 			if (j % 30 == 0) {
-				auxExtension = realloc(auxExtension, (30 + j) * sizeof(char));
+				auxExtension = realloc(auxExtension, (500 + j) * sizeof(char));
 			}
 			hidden = fgetc(in);
 			unsigned char bit;
