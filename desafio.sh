@@ -1,4 +1,7 @@
 #!/bin/bash 
+rm -rf stegobmp
+make
+
 echo "Este script corre lo necesario para generar los archivos de salida a partir de aquellos dados por la catedra\n\n"
 
 rm -rf ./resources/example2/out/*
