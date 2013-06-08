@@ -42,7 +42,7 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 		//Stenograph the encrypted message
 		char * recovered_encrypted = recover_encrypted_msg(p, parsed_steg);
 
-		//Desencrypt the recovered message
+		//Decrypt the recovered message
 		int decrypted_size = 0;
 		char * decrypted = (unsigned char*)decrypt(recovered_encrypted, &decrypted_size, a, m,
 				pass);
