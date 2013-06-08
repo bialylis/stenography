@@ -48,9 +48,8 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 				pass);
 
 		//Parse desencrypted message
-		recovered = parse_decrypted(decrypted, &extension, &extension_size,
-				decrypted_size);
-		output = recovered;
+		recovered = parse_decrypted(decrypted, &extension, &extension_size, decrypted_size);
+		output = recovered + FILE_LENGTH_SIZE;
 	} else {
 		recovered = recover_msg(p, parsed_steg, &extension_size, &extension);
 		output = recovered + FILE_LENGTH_SIZE;
