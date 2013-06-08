@@ -49,12 +49,11 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 
 		//Parse desencrypted message
 		recovered = parse_decrypted(decrypted, &extension, &extension_size, decrypted_size);
-		output = recovered + FILE_LENGTH_SIZE;
+		output = recovered + FILE_LENGTH_SIZE * sizeof(char);
 	} else {
 		recovered = recover_msg(p, parsed_steg, &extension_size, &extension);
-		output = recovered + FILE_LENGTH_SIZE;
+		output = recovered + FILE_LENGTH_SIZE * sizeof(char);
 	}
-
 	char * new_out = calloc(strlen(out) + extension_size, sizeof(char*));
 	memcpy(new_out, out, strlen(out)*sizeof(char*));
 	strcat(new_out, extension);
