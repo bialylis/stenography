@@ -72,15 +72,17 @@ char * recover_encrypted_lsb4(FILE* in) {
 		;
 	}
 	size = ntohl(size);
-	msg = calloc(size+FILE_LENGTH_SIZE, sizeof(char));
+	msg = calloc(size+FILE_LENGTH_SIZE + 1, sizeof(char));
 	memcpy(msg, &size, FILE_LENGTH_SIZE);
-		msg += FILE_LENGTH_SIZE;
+	msg += FILE_LENGTH_SIZE;
 
 	//Recover the hidden encrypted message
 	for (i = 0; i < size * 2; i++) {
 		hidden = fgetc(in);
-		*(msg + i / 2) |= LSB4_RECOVER(hidden, i)
-		;
+		if(feof(in)) {
+			printf("AL HORNOOOOOO\n");
+		}
+		*(msg + i / 2) |= LSB4_RECOVER(hidden, i);
 	}
 	msg[i / 2] = 0;
 	return msg - FILE_LENGTH_SIZE;

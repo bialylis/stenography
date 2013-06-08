@@ -14,31 +14,28 @@ const EVP_CIPHER * get_evp_algorithm(const char*algorithm, const char * mode);
 char * encrypt(char * original, int * encrypted_size, const char* algorithm,
 		const char * mode, const char * pass, int original_size) {
 
-	const EVP_CIPHER *cipher = get_evp_algorithm(algorithm, mode);
-	unsigned char *key = malloc(
-			sizeof(unsigned char) * EVP_CIPHER_key_length(cipher));
-	unsigned char *iv = malloc(
-			sizeof(unsigned char) * EVP_CIPHER_iv_length(cipher));
-
-	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass), 1, key, iv);
-
-	char *out = calloc(original_size+AES_BLOCK_SIZE + EVP_MAX_IV_LENGTH, sizeof(char));
-	int length_partial = 0, length = 0;
-
 	EVP_CIPHER_CTX ctx;
 	EVP_CIPHER_CTX_init(&ctx);
+
+	const EVP_CIPHER *cipher = get_evp_algorithm(algorithm, mode);
+
+	unsigned char *key = malloc(sizeof(unsigned char) * EVP_CIPHER_key_length(cipher));
+	unsigned char *iv = malloc(sizeof(unsigned char) * EVP_CIPHER_iv_length(cipher));
+	EVP_BytesToKey(cipher, EVP_md5(), NULL, pass, strlen(pass), 1, key, iv);
+
+	char *out = calloc(original_size+ 16 + 1, sizeof(char));
+	int length_partial = 0, length = 0;
+
 	if (EVP_EncryptInit_ex(&ctx, cipher, NULL, key, iv) == ERROR) {
 		printf("error");
 	}
-	if (EVP_EncryptUpdate(&ctx, out, &length_partial, original,
-			original_size) == ERROR) {
+	if (EVP_EncryptUpdate(&ctx, out, &length_partial, original, original_size) == ERROR) {
 		printf("error");
 	}
 
-	length = length_partial;
+	// length = length_partial;
 
-	if (EVP_EncryptFinal_ex(&ctx, out + length_partial,
-			&length) == ERROR) {
+	if (EVP_EncryptFinal_ex(&ctx, out + length_partial, &length) == ERROR) {
 		printf("error");
 	}
 
