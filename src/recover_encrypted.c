@@ -131,7 +131,7 @@ char * parse_decrypted(char * decrypted, char **extension, int *extension_size,
 
 	decrypted = decrypted + FILE_LENGTH_SIZE;
 
-	memcpy(msg, decrypted, (msg_size)*sizeof(char));
+	memcpy(msg + FILE_LENGTH_SIZE, decrypted, (msg_size)*sizeof(char));
 
 	*extension_size = size - msg_size;
 	decrypted = decrypted + msg_size;
