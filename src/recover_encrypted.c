@@ -42,19 +42,21 @@ char * recover_encrypted_lsb1(FILE* in) {
 	//Recovers encrypted size: Reads the first FILE_LENGTH_SIZE
 	for (i = 0; i < FILE_LENGTH_SIZE * BITS_PER_BYTE; i++) {
 		hidden = fgetc(in);
-		*(((char*) &size) + i / 8) |= LSB1_RECOVER(hidden, i)
-		;
+		*(((char*) &size) + i / 8) |= LSB1_RECOVER(hidden, i);
 	}
 	size = ntohl(size);
 	msg = calloc(size+FILE_LENGTH_SIZE, sizeof(char));
 	memcpy(msg, &size, FILE_LENGTH_SIZE);
-		msg += FILE_LENGTH_SIZE;
+	msg += FILE_LENGTH_SIZE;
 
 	//Recover the hidden encrypted message
 	for (i = 0; i < size * BITS_PER_BYTE; i++) {
 		hidden = fgetc(in);
-		*(msg + i / 8) |= LSB1_RECOVER(hidden,i)
-		;
+		if(feof(in)) {
+			printf("Oops! This might not be the method that the file was encrypted with!\n");
+			exit(1);
+		}
+		*(msg + i / 8) |= LSB1_RECOVER(hidden,i);
 	}
 	msg[i / 8] = 0;
 	return msg - FILE_LENGTH_SIZE;
@@ -80,7 +82,8 @@ char * recover_encrypted_lsb4(FILE* in) {
 	for (i = 0; i < size * 2; i++) {
 		hidden = fgetc(in);
 		if(feof(in)) {
-			printf("AL HORNOOOOOO\n");
+			printf("Oops! This might not be the method that the file was encrypted with!\n");
+			exit(1);
 		}
 		*(msg + i / 2) |= LSB4_RECOVER(hidden, i);
 	}
@@ -109,6 +112,10 @@ char * recover_encrypted_lsbe(FILE* in) {
 	i = 0;
 	while (i < size * BITS_PER_BYTE) {
 		hidden = fgetc(in);
+		if(feof(in)) {
+			printf("Oops! This might not be the method that the file was encrypted with!\n");
+			exit(1);
+		}
 		if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
 			*(msg + i / 8) |= LSBE_RECOVER(hidden,i);
 			i++;
@@ -138,5 +145,5 @@ char * parse_decrypted(char * decrypted, char **extension, int *extension_size,
 	*extension = calloc(*extension_size,sizeof(char));
 	memcpy(*extension, decrypted, (*extension_size)*sizeof(char));
 
-	return msg - FILE_LENGTH_SIZE;
+	return msg;
 }
