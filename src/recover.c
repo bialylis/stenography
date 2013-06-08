@@ -77,7 +77,10 @@ char* recover_lsb4(FILE* in, int *extension_size, char** extension) {
 	//Recover the hidden message
 	for (i = 0; i < size * 2; i++) {
 		hidden = fgetc(in);
-		printf("(%c - %d)\n",hidden,i);
+		if(feof(in)) {
+			printf("AL HORNOOOOOO\n");
+		}
+		// printf("(%c - %d)\n",hidden,i);
 		*(msg + i / 2) |= LSB4_RECOVER(hidden, i);
 	}
 	msg[i / 2] = 0;
@@ -125,47 +128,50 @@ int recover_extension(FILE *in, char **extension, char algorithm) {
 	char *auxExtension = calloc(30, sizeof(char));
 	unsigned char hidden;
 	while (!ended) {
-		if (j % 30 == 0) {
-			auxExtension = realloc(auxExtension, (30 + j) * sizeof(char));
-		}
-		hidden = fgetc(in);
-		unsigned char bit;
-		switch (algorithm) {
-		case LSB1:
-			bit = LSB1_RECOVER(hidden, j)
-			;
-			*(auxExtension + j / 8) |= bit;
-			j++;
-			break;
-		case LSB4:
-			bit = LSB4_RECOVER(hidden, j)
-			;
-			*(auxExtension + j / 2) |= bit;
-			j++;
-			break;
-		case LSBE:
-			if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
-				bit = LSBE_RECOVER(hidden, j)
-				;
-				*(auxExtension + j / 8) |= bit;
-				j++;
-			}
-			break;
-		}
-
-		//Searchs for 8 consecute 0, that means for the '\0'
-		if (bit == 0) {
-			counter++;
-		} else {
-			counter = 0;
-		}
-		if (counter == 8) {
+		if(feof(in)){
 			ended = 1;
-		}
-		if (j % 8 == 0) {
-			counter = 0;
-		}
+		} else {
+			if (j % 30 == 0) {
+				auxExtension = realloc(auxExtension, (30 + j) * sizeof(char));
+			}
+			hidden = fgetc(in);
+			unsigned char bit;
+			switch (algorithm) {
+				case LSB1:
+					bit = LSB1_RECOVER(hidden, j)
+					;
+					*(auxExtension + j / 8) |= bit;
+					j++;
+					break;
+				case LSB4:
+					bit = LSB4_RECOVER(hidden, j)
+					;
+					*(auxExtension + j / 2) |= bit;
+					j++;
+					break;
+				case LSBE:
+					if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
+						bit = LSBE_RECOVER(hidden, j)
+						;
+						*(auxExtension + j / 8) |= bit;
+						j++;
+					}
+					break;
+			}
 
+			//Searches for 8 consecute 0, that means for the '\0'
+			if (bit == 0) {
+				counter++;
+			} else {
+				counter = 0;
+			}
+			if (counter == 8) {
+				ended = 1;
+			}
+			if (j % 8 == 0) {
+				counter = 0;
+			}
+		}
 	}
 	*extension = auxExtension;
 	return j;
