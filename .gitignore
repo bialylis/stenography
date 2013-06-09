@@ -19,3 +19,4 @@ VagrantFile
 .vagrant/
 .DS_Store
 resources/example*/out/
+#resources/tests/tests*/*
