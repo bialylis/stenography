@@ -17,11 +17,11 @@ char* parse_message(const char* filename, int *length) {
 	FILE* in = fopen(filename, "r");
 	char* extension = parse_extension(filename);
 	int size = get_file_size(filename);
-	
+
 	// Length = 4 (para el tamaño del archivo) + longitud archivo + longitud extension + 1 ('\0')
 	*length = FILE_LENGTH_SIZE + size + strlen(extension) + 1;
 
-	char* msg = malloc((*length)*sizeof(char));
+	char* msg = malloc((*length) * sizeof(char));
 	char c;
 	char *p = msg;
 	char i;
@@ -84,4 +84,17 @@ char* preappend_size(char* msg) {
 	memcpy(out, &length, FILE_LENGTH_SIZE);
 	strcpy(out+FILE_LENGTH_SIZE, msg);
 	return out;
+}
+
+int get_lsbe_bytes(const char* filename) {
+	FILE* f = fopen(filename, "rb");
+	fseek(f, HEADER_BYTES, SEEK_SET);
+	unsigned char c;
+	int lsbe_bytes = 0;
+	while (((c = fgetc(f)) || 1) && !feof(f)) {
+		if (c == LSBE_BYTE_SET_1 || c == LSBE_BYTE_SET_2) {
+			lsbe_bytes++;
+		}
+	}
+	return lsbe_bytes;
 }

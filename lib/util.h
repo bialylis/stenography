@@ -6,6 +6,9 @@
 #define LSBE 3
 #define LSBE_BYTE_SET_1 255
 #define LSBE_BYTE_SET_2 254
+#define LSB1_NECESSARY_SPACE 8
+#define LSB4_NECESSARY_SPACE 2
+#define LSBE_NECESSARY_SPACE 8
 
 #define HEADER_BYTES 54
 #define FILE_LENGTH_SIZE 4
@@ -34,5 +37,6 @@ char get_nibble(char* bytes, int n);
 int get_algorithm(const char* string);
 char* parse_message(const char* filename, int* length);
 char* preappend_size(char* msg);
+int get_lsbe_bytes(const char* filename);
 
 #endif
