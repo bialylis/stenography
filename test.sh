@@ -52,6 +52,25 @@ echo "Test #3: encrypt message with AES256 - LSBE - CBC - pass -> cripto\n"
 ./stegobmp --extract -p resources/tests/tests2/ocultadoLSBE.bmp -o resources/tests/tests2/mensajeoutLSBE  -s LSBE -a aes128 -m cbc --pass cripto
 echo "Done!\n\n\n\n"
 
+echo "Done with AES 256!\n"
+
+echo "Test #1: encrypt message with DES - LSB1 - CBC - pass -> cripto\n"
+./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/tests/tests4/ocultadoLSB1.bmp -s LSB1 -a des -m cbc --pass cripto
+./stegobmp --extract -p resources/tests/tests4/ocultadoLSB1.bmp -o resources/tests/tests4/mensajeoutLSB1  -s LSB1 -a des -m cbc --pass cripto
+echo "Done!\n\n\n\n"
+
+
+echo "Test #2: encrypt message with DES - LSB4 - CBC - pass -> cripto\n"
+./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/tests/tests4/ocultadoLSB4.bmp -s LSB4 -a des -m cbc --pass cripto
+./stegobmp --extract -p resources/tests/tests4/ocultadoLSB4.bmp -o resources/tests/tests4/mensajeoutLSB4  -s LSB4 -a des -m cbc --pass cripto
+echo "Done!\n\n\n\n"
+
+
+
+echo "Test #3: encrypt message with AES256 - LSBE - CBC - pass -> cripto\n"
+./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/tests/tests4/ocultadoLSBE.bmp -s LSBE -a des -m cbc --pass cripto
+./stegobmp --extract -p resources/tests/tests4/ocultadoLSBE.bmp -o resources/tests/tests4/mensajeoutLSBE  -s LSBE -a des -m cbc --pass cripto
+echo "Done!\n\n\n\n"
 
 
 echo "Done with personal tests!\n"
