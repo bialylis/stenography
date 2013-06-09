@@ -44,11 +44,12 @@ int ext(const char * p, const char * out, const char * steg, const char * a,
 
 		//Decrypt the recovered message
 		int decrypted_size = 0;
-		char * decrypted = (unsigned char*)decrypt(recovered_encrypted, &decrypted_size, a, m,
-				pass);
+		char *out = malloc(*((int*) recovered_encrypted)* sizeof(char)+200*sizeof(char));
+		char * decrypted = (char*)decrypt(recovered_encrypted, &decrypted_size, a, m,
+				pass, out);
 
 		//Parse desencrypted message
-		recovered = parse_decrypted(decrypted, &extension, &extension_size, decrypted_size);
+		recovered = parse_decrypted(out, &extension, &extension_size, decrypted_size);
 		output = recovered + FILE_LENGTH_SIZE * sizeof(char);
 	} else {
 		recovered = recover_msg(p, parsed_steg, &extension_size, &extension);
