@@ -18,5 +18,5 @@
 VagrantFile
 .vagrant/
 .DS_Store
-resources/example*/out/
-#resources/tests/tests*/*
+resources/example2/out/*
+resources/tests/tests*/*

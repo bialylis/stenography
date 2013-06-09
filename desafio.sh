@@ -3,8 +3,9 @@ rm -rf stegobmp
 make
 
 echo "Este script corre lo necesario para generar los archivos de salida a partir de aquellos dados por la catedra\n\n"
-
+mkdir -p ./resources/example2/out
 rm -rf ./resources/example2/out/*
+
 
 echo "1 -> Extrayendo de ironlady.bmp utilizando LSB4\n\n"
 ./stegobmp --extract -p resources/example2/ironlady.bmp -o resources/example2/out/salida2 -s LSB4

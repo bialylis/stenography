@@ -8,6 +8,10 @@ make
 #clear tests folder
 echo "Clearing tests folder\n"
 
+mkdir -p ./resources/tests/tests1
+mkdir -p ./resources/tests/tests2
+mkdir -p ./resources/tests/tests3
+
 rm -rf ./resources/tests/tests1/*
 rm -rf ./resources/tests/tests2/*
 rm -rf ./resources/tests/tests3/*
