@@ -15,7 +15,6 @@ int emb(const char* in, const char * p, const char * out, const char * steg,
 
 	//Message new size
 	int size = *((int*) msg);
-	printf("Hidden size: %d\n", ntohl(size));
 	if (*pass) {
 		int encrypted_size = 0;
 		char * encrypted = (unsigned char*)encrypt(msg, &encrypted_size, a, m, pass,length);

@@ -5,16 +5,19 @@ echo "Building program's latest version\n"
 rm stegobmp
 make
 
-#clear tests folder
-echo "Clearing tests folder\n"
-
+#creating tests folder
 mkdir -p ./resources/tests/tests1
 mkdir -p ./resources/tests/tests2
 mkdir -p ./resources/tests/tests3
+mkdir -p ./resources/tests/tests4
+
+#clear tests folder
+echo "Clearing tests folder\n"
 
 rm -rf ./resources/tests/tests1/*
 rm -rf ./resources/tests/tests2/*
 rm -rf ./resources/tests/tests3/*
+rm -rf ./resources/tests/tests4/*
 
 echo "Test #1: encrypt message with AES128 - LSB1 - CBC - pass -> cripto\n"
 ./stegobmp --embed --in resources/tests/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/tests/tests1/ocultadoLSB1.bmp -s LSB1 -a aes128 -m cbc --pass cripto
