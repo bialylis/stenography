@@ -125,48 +125,60 @@ char* recover_lsbe(FILE* in, int *extension_size, char** extension) {
 
 int recover_extension(FILE *in, char **extension, char algorithm) {
 	int j = 0, ended = 0, counter = 0;
-	char *auxExtension = NULL;
+	char *auxExtension = calloc(500, sizeof(char));;
 	unsigned char hidden;
 	while (!ended) {
 		if(feof(in)){
 			ended = 1;
 		} else {
-			if (j % 30 == 0) {
-				auxExtension = realloc(auxExtension, (500 + j) * sizeof(char));
-			}
 			hidden = fgetc(in);
 			unsigned char bit;
 			switch (algorithm) {
 				case LSB1:
 					bit = LSB1_RECOVER(hidden, j);
 					*(auxExtension + j / 8) |= bit;
+					if(j % 8 == 0) {
+						counter = 0;
+					}
+					if(bit == 0) {
+						counter++;
+					}
+					if(counter == 8) {
+						ended = 1;
+					}
 					j++;
 					break;
 				case LSB4:
 					bit = LSB4_RECOVER(hidden, j);
 					*(auxExtension + j / 2) |= bit;
+					if(j % 2 == 0) {
+						counter = 0;
+					}
+					if(bit == 0) {
+						counter++;
+					}
+					if(counter == 2) {
+						ended = 1;
+					}
 					j++;
 					break;
 				case LSBE:
 					if (hidden == LSBE_BYTE_SET_1 || hidden == LSBE_BYTE_SET_2) {
 						bit = LSBE_RECOVER(hidden, j);
 						*(auxExtension + j / 8) |= bit;
+						if(j % 8 == 0) {
+							counter = 0;
+						}
+						if(bit == 0) {
+							counter++;
+						}
+						if(counter == 8) {
+							ended = 1;
+						}
+
 						j++;
 					}
 					break;
-			}
-
-			//Searches for 8 consecute 0, that means for the '\0'
-			if (bit == 0) {
-				counter++;
-			} else {
-				counter = 0;
-			}
-			if (counter == 8) {
-				ended = 1;
-			}
-			if (j % 8 == 0) {
-				counter = 0;
 			}
 		}
 	}
