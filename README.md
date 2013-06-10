@@ -1,55 +1,30 @@
 TP2 Criptografía y Segunidad
 ============================
 
-The following libraries must be installed:
-  apt-get install libmcrypt-dev
-  apt-get install libargtable2-dev
+The libargtable2-dev library must be installed:
+	apt-get install libargtable2-dev 
+	
+In the root of the project the following scripts can be found:
+	1) desafio.sh with the commands to get the hidden video.
+	2) test.sh with several tests
 
-and then build executing make
+Argumentos are:
+ [--extract] [--embed] [-i <input hide file>] -p <input bmp> -o <output bmp> -s LSB1|LSB4|LSBE [-a aes128|aes192|aes256|des] [-m ecb|cfb|ofb|cbc] [-P <char>]
+
+Required parameteres:
+ --extract:	Indica que se va a extraer información.
+ --embed: Indica que se va a ocultar información.
+ -i o --in: Archivo que se va a ocultar.
+ -p: Archivo bmp portador.
+ -o o --out: Archivo de salida.
+ -s o --steg LSB1|LSB4|LSBE: Algoritmo de esteganografiado.
+
+Optional parameters:
+ -a aes128|aes192|aes256|des: Algoritmo de encriptación/desencriptación.
+ -m ecb|cfb|ofb|cbc: Modo de encriptación/desencriptación.
+ -P o --pass: Contraseña para la encriptación.
 
 
-Example1:
-
-//JPG 135054 bytes
-./stegobmp --extract  -p resources/example/loimposibleE.bmp -o resources/example/out/salida1 -s LSBE
-
-
-//MP3 2348246 bytes
-./stegobmp --extract -p resources/example/sherlock1.bmp -o resources/example/out/salida2  -s LSB1
-
-
-//MP3 2348246 bytes
-./stegobmp --extract -p resources/example/sherlock4.bmp -o resources/example/out/salida3  -s LSB4
-
-//MP3 2348246 bytes
-Encripción: 2348255 bytes
-./stegobmp --extract -p resources/example/sherlock4aes256ofb.bmp -o resources/example/out/salida4  -s LSB4 -a aes256 -m ofb --pass secreto
-
-Example2:
-
-//WMV 908KB
-./stegobmp --extract  -p resources/example2/loimposible.bmp -o resources/example2/out/salida1 -s LSB1
-
-//PNG 42852 bytes => .zip => .txt with instructions
-./stegobmp --extract  -p resources/example2/ironlady.bmp -o resources/example2/out/salida2 -s LSB4
-
-//PDF 6KB
-./stegobmp --extract  -p resources/example2/hugo.bmp -o resources/example2/out/salida2 -s LSBE
-
-Our examples:
-
-./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/ocultado.bmp -s LSB1
-./stegobmp --extract  -p resources/ocultado.bmp -o resources/mensajeout -s LSB1
-
-./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/ocultado.bmp -s LSB4
-./stegobmp --extract  -p resources/ocultado.bmp -o resources/mensajeout -s LSB4
-
-./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/ocultado.bmp -s LSBE
-./stegobmp --extract  -p resources/ocultado.bmp -o resources/mensajeout -s LSBE
-
-//NO ANDA
-./stegobmp --embed --in resources/mensaje.txt  -p resources/example/loimposibleE.bmp -o resources/ocultado.bmp -s LSB4 -a aes128 -m cbc --pass cripto
-./stegobmp --extract -p resources/ocultado.bmp -o resources/mensajeout  -s LSB4 -a aes128 -m cbc --pass cripto
 
 
 
